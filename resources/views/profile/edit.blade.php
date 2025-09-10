@@ -1,8 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <img class="h-16 w-16 rounded-full border-2 border-indigo-500" src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=6366f1&color=fff" alt="{{ $user->name }}">
+            </div>
+            <div class="ml-4">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    {{ __('Profile') }}
+                </h2>
+                <p class="text-sm text-gray-500">{{ $user->email }}</p>
+            </div>
+        </div>
     </x-slot>
 
     <div class="py-12">

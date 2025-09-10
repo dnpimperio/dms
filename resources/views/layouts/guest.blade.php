@@ -15,15 +15,20 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gradient-to-br from-indigo-500 to-purple-600">
+            <div class="mb-4">
+                <a href="/" class="flex items-center">
+                    <x-application-logo class="w-20 h-20 text-white fill-current" />
+                    <span class="ml-3 text-3xl font-bold text-white">DMS</span>
                 </a>
             </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+            <div class="w-full sm:max-w-md mt-6 px-6 py-8 bg-white shadow-xl overflow-hidden sm:rounded-lg">
                 {{ $slot }}
+            </div>
+
+            <div class="mt-8 text-center text-white text-sm">
+                &copy; {{ date('Y') }} Dormitory Management System. All rights reserved.
             </div>
         </div>
     </body>
