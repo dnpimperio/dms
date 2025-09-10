@@ -1,17 +1,26 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import fs from 'fs';
+import path from 'path';
 
-const rootRedirectPlugin = {
-    name: 'root-redirect-to-index',
+const serveRootIndexPlugin = {
+    name: 'serve-root-index',
     apply: 'serve',
     enforce: 'pre',
     configureServer(server) {
-        server.middlewares.use((req, res, next) => {
+        server.middlewares.use(async (req, res, next) => {
             if (req.url === '/' || req.url === '') {
-                res.statusCode = 302;
-                res.setHeader('Location', '/index.html');
-                res.end();
-                return;
+                try {
+                    const filePath = path.resolve(process.cwd(), 'index.html');
+                    const rawHtml = fs.readFileSync(filePath, 'utf-8');
+                    const html = await server.transformIndexHtml('/', rawHtml);
+                    res.setHeader('Content-Type', 'text/html');
+                    res.statusCode = 200;
+                    res.end(html);
+                    return;
+                } catch (e) {
+                    // Fall back if reading index.html fails
+                }
             }
             next();
         });
@@ -20,7 +29,7 @@ const rootRedirectPlugin = {
 
 export default defineConfig({
     plugins: [
-        rootRedirectPlugin,
+        serveRootIndexPlugin,
         laravel({
             input: [
                 'resources/css/app.css',
