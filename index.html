@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dormitory Management - Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/resources/css/app.css" />
+  </head>
+  <body class="min-h-screen bg-gray-100 text-gray-800">
+    <header class="bg-white shadow">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+        <h1 class="text-xl font-semibold">Dormitory Management</h1>
+        <nav class="flex items-center gap-4 text-sm">
+          <a class="text-gray-700 hover:text-gray-900" href="/">Home</a>
+          <a class="text-gray-700 hover:text-gray-900" href="/dashboard">Dashboard</a>
+          <a class="text-gray-700 hover:text-gray-900" href="/login">Login</a>
+          <a class="text-gray-700 hover:text-gray-900" href="/register">Register</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+      <section class="grid gap-6 md:grid-cols-3">
+        <div class="rounded-lg bg-white p-6 shadow">
+          <h2 class="text-lg font-semibold">Users</h2>
+          <p class="mt-2 text-sm text-gray-600">Manage user accounts, roles, and status.</p>
+          <div class="mt-4">
+            <a href="/admin/users" class="inline-flex items-center rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800">Open Users</a>
+          </div>
+        </div>
+        <div class="rounded-lg bg-white p-6 shadow">
+          <h2 class="text-lg font-semibold">Tenants</h2>
+          <p class="mt-2 text-sm text-gray-600">View and manage tenant records and contacts.</p>
+          <div class="mt-4">
+            <a href="/admin/tenants" class="inline-flex items-center rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800">Open Tenants</a>
+          </div>
+        </div>
+        <div class="rounded-lg bg-white p-6 shadow">
+          <h2 class="text-lg font-semibold">Rooms</h2>
+          <p class="mt-2 text-sm text-gray-600">Assign rooms and update room availability.</p>
+          <div class="mt-4">
+            <a href="/admin/rooms" class="inline-flex items-center rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800">Open Rooms</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-10">
+        <div class="rounded-lg border border-gray-200 bg-white p-6">
+          <h3 class="text-base font-semibold">About this preview</h3>
+          <p class="mt-2 text-sm text-gray-600">
+            This front‑end preview runs with Vite only. Backend PHP routes (Blade, auth, admin) require a PHP server and will not function here.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/resources/js/app.js"></script>
+  </body>
+</html>
