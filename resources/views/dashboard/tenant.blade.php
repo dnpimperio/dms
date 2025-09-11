@@ -33,7 +33,7 @@
                             <a href="#" class="btn btn-primary">
                                 <i class="fas fa-file-invoice"></i> View Bills
                             </a>
-                            <a href="#" class="btn btn-success">
+                            <a href="{{ route('maintenance-requests.create') }}" class="btn btn-success">
                                 <i class="fas fa-tools"></i> Submit Maintenance Request
                             </a>
                             <a href="#" class="btn btn-info">
