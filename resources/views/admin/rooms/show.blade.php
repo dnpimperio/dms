@@ -75,6 +75,66 @@
                         </div>
                     @endif
 
+                    <!-- Tenant Assignment Section -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Room Assignments</h3>
+                            @if($room->status === 'available')
+                                <a href="{{ route('room-assignments.create', ['room_id' => $room->id]) }}" 
+                                   class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150">
+                                    <i class="fas fa-plus mr-2"></i> Assign Tenant
+                                </a>
+                            @endif
+                        </div>
+
+                        @if($room->currentAssignments->count() > 0)
+                            <div class="bg-white shadow overflow-hidden sm:rounded-md">
+                                <ul class="divide-y divide-gray-200">
+                                    @foreach($room->currentAssignments as $assignment)
+                                        <li class="px-4 py-4">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center">
+                                                    <div class="ml-3">
+                                                        <p class="text-sm font-medium text-gray-900">
+                                                            {{ $assignment->tenant->full_name }}
+                                                        </p>
+                                                        <p class="text-sm text-gray-500">
+                                                            From: {{ $assignment->start_date->format('M d, Y') }}
+                                                            @if($assignment->end_date)
+                                                                to {{ $assignment->end_date->format('M d, Y') }}
+                                                            @endif
+                                                        </p>
+                                                        <p class="text-sm text-gray-500">
+                                                            Monthly Rent: ₱{{ number_format($assignment->monthly_rent, 2) }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="flex space-x-2">
+                                                    <a href="{{ route('room-assignments.show', $assignment) }}" 
+                                                       class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                        View Details
+                                                    </a>
+                                                    @if($assignment->status === 'active')
+                                                        <form action="{{ route('room-assignments.end', $assignment) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" onclick="return confirm('Are you sure you want to end this assignment?')"
+                                                                    class="inline-flex items-center px-3 py-1 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                                                End Assignment
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @else
+                            <p class="text-gray-500 text-sm">No current assignments for this room.</p>
+                        @endif
+                    </div>
+
                     <!-- Quick Status Update -->
                     <div class="mt-6 pt-6 border-t border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Status Update</h3>

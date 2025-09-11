@@ -48,4 +48,14 @@ class Tenant extends Model
     {
         return "{$this->first_name} " . ($this->middle_name ? "{$this->middle_name} " : "") . "{$this->last_name}";
     }
+
+    public function roomAssignments()
+    {
+        return $this->hasMany(RoomAssignment::class);
+    }
+
+    public function activeRoomAssignment()
+    {
+        return $this->hasOne(RoomAssignment::class)->where('status', 'active');
+    }
 }

@@ -29,8 +29,15 @@
 
             <!-- Page Content -->
             <main>
-                {{ $slot }}
+                @hasSection('content')
+                    @yield('content')
+                @else
+                    {{ $slot ?? '' }}
+                @endif
             </main>
         </div>
+        
+        <!-- Stack Scripts -->
+        @stack('scripts')
     </body>
 </html>

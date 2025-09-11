@@ -66,7 +66,8 @@ class RoomController extends Controller
      */
     public function show(Room $room)
     {
-        $room->current_occupants = 0; // TODO: Implement this when tenant-room relationship is set up
+        $room->load(['currentAssignments.tenant']);
+        $room->current_occupants = $room->getCurrentOccupantsAttribute();
         return view('admin.rooms.show', compact('room'));
     }
 

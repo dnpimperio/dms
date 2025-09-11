@@ -49,4 +49,19 @@ class Room extends Model
     {
         return $this->current_occupants < $this->capacity;
     }
+
+    public function assignments()
+    {
+        return $this->hasMany(RoomAssignment::class);
+    }
+
+    public function currentAssignments()
+    {
+        return $this->hasMany(RoomAssignment::class)->where('status', 'active');
+    }
+
+    public function getCurrentOccupantsAttribute()
+    {
+        return $this->currentAssignments()->count();
+    }
 }

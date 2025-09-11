@@ -43,10 +43,17 @@ export default defineConfig({
             host: 'localhost',
         },
         proxy: {
+            // Proxy API requests
             '/api': {
                 target: 'http://localhost:8000',
                 changeOrigin: true,
+            },
+            // Proxy all other requests except Vite's own requests
+            '^/(?!build/|resources/|node_modules/|@vite/).*': {
+                target: 'http://localhost:8000',
+                changeOrigin: true,
+                secure: false,
             }
-        }
+        },
     },
 });

@@ -18,6 +18,47 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::middleware(['auth'])->group(function () {
+    // Redirect to appropriate dashboard based on role
+    Route::get('/dashboard', function () {
+        switch (auth()->user()->role) {
+            case 'admin':
+                return redirect()->route('admin.dashboard');
+            case 'tenant':
+                return redirect()->route('tenant.dashboard');
+            case 'staff':
+                return redirect()->route('staff.dashboard');
+            default:
+                return redirect()->route('login');
+        }
+    })->name('dashboard');
+
+    // Admin routes
+    Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\Admin\AdminController::class, 'index'])->name('admin.dashboard');
+        Route::resource('room-assignments', \App\Http\Controllers\RoomAssignmentController::class);
+        Route::get('room-assignments/check-availability', [\App\Http\Controllers\RoomAssignmentController::class, 'checkAvailability'])
+            ->name('room-assignments.check-availability');
+        Route::patch('room-assignments/{roomAssignment}/end', [\App\Http\Controllers\RoomAssignmentController::class, 'end'])
+            ->name('room-assignments.end');
+        Route::resource('rooms', \App\Http\Controllers\RoomController::class);
+        Route::resource('tenants', \App\Http\Controllers\TenantController::class);
+    });
+
+    // Tenant routes
+    Route::middleware(['role:tenant'])->group(function () {
+        Route::get('/tenant/dashboard', [App\Http\Controllers\TenantDashboardController::class, 'index'])->name('tenant.dashboard');
+        Route::resource('maintenance-requests', \App\Http\Controllers\MaintenanceRequestController::class);
+    });
+
+    // Staff routes
+    Route::middleware(['role:staff'])->group(function () {
+        Route::get('/staff/dashboard', [App\Http\Controllers\StaffDashboardController::class, 'index'])->name('staff.dashboard');
+        Route::patch('/maintenance-tasks/{task}/status', [App\Http\Controllers\MaintenanceRequestController::class, 'updateStatus'])
+            ->name('maintenance-tasks.update-status');
+    });
+});
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
