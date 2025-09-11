@@ -81,7 +81,7 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <a href="#" class="btn btn-sm btn-info">
+                                                <a href="{{ route('maintenance-requests.show', $request) }}" class="btn btn-sm btn-info">
                                                     <i class="fas fa-eye"></i> View
                                                 </a>
                                             </td>
