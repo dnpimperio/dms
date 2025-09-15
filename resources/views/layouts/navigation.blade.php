@@ -25,6 +25,9 @@
                         <x-nav-link :href="route('admin.rooms.index')" :active="request()->routeIs('admin.rooms.*')">
                             {{ __('Room Management') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('admin.bills.index')" :active="request()->routeIs('admin.bills.*')">
+                            {{ __('Billing Management') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>

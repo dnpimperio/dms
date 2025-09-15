@@ -8,10 +8,10 @@
         </div>
         <div class="col-auto">
             <div class="btn-group">
-                <a href="{{ route('rooms.create') }}" class="btn btn-primary">
+                <a href="{{ route('admin.rooms.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> New Room
                 </a>
-                <a href="{{ route('tenants.create') }}" class="btn btn-success">
+                <a href="{{ route('admin.tenants.create') }}" class="btn btn-success">
                     <i class="fas fa-user-plus"></i> New Tenant
                 </a>
             </div>
@@ -88,13 +88,13 @@
                 </div>
                 <div class="card-body">
                     <div class="list-group">
-                        <a href="{{ route('rooms.index') }}" class="list-group-item list-group-item-action">
+                        <a href="{{ route('admin.rooms.index') }}" class="list-group-item list-group-item-action">
                             <i class="fas fa-door-open"></i> Room Management
                         </a>
-                        <a href="{{ route('tenants.index') }}" class="list-group-item list-group-item-action">
+                        <a href="{{ route('admin.tenants.index') }}" class="list-group-item list-group-item-action">
                             <i class="fas fa-users"></i> Tenant Management
                         </a>
-                        <a href="{{ route('room-assignments.index') }}" class="list-group-item list-group-item-action">
+                        <a href="{{ route('admin.room-assignments.index') }}" class="list-group-item list-group-item-action">
                             <i class="fas fa-key"></i> Room Assignments
                         </a>
                         <a href="#" class="list-group-item list-group-item-action">

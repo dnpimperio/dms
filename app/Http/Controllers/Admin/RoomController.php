@@ -19,9 +19,16 @@ class RoomController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $rooms = Room::orderBy('room_number')->get();
+        $query = Room::orderBy('room_number');
+        
+        // Show hidden rooms if requested
+        if (!$request->show_hidden) {
+            $query->where('hidden', false);
+        }
+        
+        $rooms = $query->get();
         return view('admin.rooms.index', compact('rooms'));
     }
 
@@ -41,6 +48,29 @@ class RoomController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    public function toggleHidden(Room $room)
+    {
+        $room->update(['hidden' => !$room->hidden]);
+        return back()->with('success', 'Room visibility updated successfully');
+    }
+
+    public function toggleStatus(Room $room)
+    {
+        $newStatus = $room->status === 'available' ? 'unavailable' : 'available';
+        $room->update(['status' => $newStatus]);
+        return back()->with('success', 'Room status updated successfully');
+    }
+
+    public function updateRate(Request $request, Room $room)
+    {
+        $request->validate([
+            'rate' => ['required', 'numeric', 'min:0']
+        ]);
+
+        $room->update(['rate' => $request->rate]);
+        return back()->with('success', 'Room rate updated successfully');
+    }
+
     public function store(Request $request)
     {
         $request->validate([

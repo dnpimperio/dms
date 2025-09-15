@@ -39,6 +39,16 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
+        <!-- Hidden Gender Field -->
+        <input type="hidden" name="gender" value="female">
+
+        <!-- Female Only Notice -->
+        <div class="mt-4 p-4 bg-yellow-50 rounded-lg">
+            <p class="text-sm text-yellow-800">
+                <strong>Note:</strong> This is a female-only dormitory. Registration is only open to female tenants.
+            </p>
+        </div>
+
         <div class="flex items-center justify-end mt-4">
             <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
                 {{ __('Already registered?') }}

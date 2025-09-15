@@ -16,7 +16,8 @@ class Room extends Model
         'capacity',
         'current_occupants',
         'status',
-        'description'
+        'description',
+        'hidden'
     ];
 
     protected $casts = [

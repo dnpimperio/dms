@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'role',
         'status',
+        'gender',
     ];
 
     /**
@@ -44,4 +45,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Get the room assignments for the user.
+     */
+    public function roomAssignments()
+    {
+        return $this->hasMany(RoomAssignment::class, 'tenant_id');
+    }
 }

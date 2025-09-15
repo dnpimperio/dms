@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        return redirect('/dashboard');
+    }
+    return redirect('/login');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -41,8 +44,18 @@ Route::middleware(['auth'])->group(function () {
             ->name('room-assignments.check-availability');
         Route::patch('room-assignments/{roomAssignment}/end', [\App\Http\Controllers\RoomAssignmentController::class, 'end'])
             ->name('room-assignments.end');
-        Route::resource('rooms', \App\Http\Controllers\RoomController::class);
+        Route::resource('rooms', \App\Http\Controllers\Admin\RoomController::class)->names('admin.rooms');
+        Route::patch('rooms/{room}/toggle-hidden', [\App\Http\Controllers\Admin\RoomController::class, 'toggleHidden'])->name('admin.rooms.toggle-hidden');
+        Route::patch('rooms/{room}/toggle-status', [\App\Http\Controllers\Admin\RoomController::class, 'toggleStatus'])->name('admin.rooms.toggle-status');
+        Route::patch('rooms/{room}/update-rate', [\App\Http\Controllers\Admin\RoomController::class, 'updateRate'])->name('admin.rooms.update-rate');
         Route::resource('tenants', \App\Http\Controllers\TenantController::class);
+        
+        // Billing routes
+        Route::resource('bills', \App\Http\Controllers\Admin\BillController::class)->names('admin.bills');
+        Route::post('bills/generate-monthly', [\App\Http\Controllers\Admin\BillController::class, 'generateMonthlyBills'])
+            ->name('admin.bills.generate-monthly');
+        Route::patch('bills/{bill}/update-payment', [\App\Http\Controllers\Admin\BillController::class, 'updatePayment'])
+            ->name('admin.bills.update-payment');
     });
 
     // Tenant routes
