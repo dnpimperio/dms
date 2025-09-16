@@ -68,17 +68,17 @@
                             <dl class="space-y-3">
                                 <div class="flex justify-between">
                                     <dt class="text-sm font-medium text-gray-500">Name</dt>
-                                    <dd class="text-sm text-gray-900 font-semibold">{{ $roomAssignment->tenant->name }}</dd>
+                                    <dd class="text-sm text-gray-900 font-semibold">{{ $roomAssignment->tenant->full_name }}</dd>
                                 </div>
-                                @if(isset($roomAssignment->tenant->phone))
+                                @if(isset($roomAssignment->tenant->phone_number))
                                 <div class="flex justify-between">
                                     <dt class="text-sm font-medium text-gray-500">Phone</dt>
-                                    <dd class="text-sm text-gray-900">{{ $roomAssignment->tenant->phone }}</dd>
+                                    <dd class="text-sm text-gray-900">{{ $roomAssignment->tenant->phone_number }}</dd>
                                 </div>
                                 @endif
                                 <div class="flex justify-between">
                                     <dt class="text-sm font-medium text-gray-500">Email</dt>
-                                    <dd class="text-sm text-gray-900">{{ $roomAssignment->tenant->email }}</dd>
+                                    <dd class="text-sm text-gray-900">{{ $roomAssignment->tenant->personal_email }}</dd>
                                 </div>
                                 <div class="flex justify-between">
                                     <dt class="text-sm font-medium text-gray-500">Gender</dt>
