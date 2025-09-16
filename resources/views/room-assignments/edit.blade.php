@@ -51,7 +51,7 @@
                                     @foreach($tenants as $tenant)
                                         <option value="{{ $tenant->id }}"
                                                 {{ (old('tenant_id', $roomAssignment->tenant_id) == $tenant->id) ? 'selected' : '' }}>
-                                            {{ $tenant->name }} ({{ $tenant->email }})
+                                            {{ $tenant->full_name }} ({{ $tenant->personal_email }})
                                         </option>
                                     @endforeach
                                 </select>
