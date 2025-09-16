@@ -51,14 +51,32 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                            <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="text-{{ $user->status === 'active' ? 'red' : 'green' }}-600 hover:text-{{ $user->status === 'active' ? 'red' : 'green' }}-900">
-                                                    {{ $user->status === 'active' ? 'Block' : 'Unblock' }}
-                                                </button>
-                                            </form>
+                                            <div class="flex items-center space-x-2">
+                                                <a href="{{ route('admin.users.edit', $user) }}" 
+                                                   class="inline-flex items-center p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-full transition duration-150 ease-in-out"
+                                                   title="Edit User">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                    </svg>
+                                                </a>
+                                                <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" 
+                                                            class="inline-flex items-center p-2 text-{{ $user->status === 'active' ? 'red' : 'green' }}-600 hover:text-{{ $user->status === 'active' ? 'red' : 'green' }}-900 hover:bg-{{ $user->status === 'active' ? 'red' : 'green' }}-50 rounded-full transition duration-150 ease-in-out"
+                                                            title="{{ $user->status === 'active' ? 'Block User' : 'Unblock User' }}">
+                                                        @if($user->status === 'active')
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L12 21a9 9 0 01-9-9 9 9 0 019-9m0 0a9 9 0 019 9 9 9 0 01-9 9"></path>
+                                                            </svg>
+                                                        @else
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                            </svg>
+                                                        @endif
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
