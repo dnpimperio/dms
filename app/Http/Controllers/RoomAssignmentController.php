@@ -33,26 +33,22 @@ class RoomAssignmentController extends Controller
 
     public function create(Request $request)
     {
-        // Get available rooms (either unoccupied or not in active assignment)
-        $rooms = Room::where(function($query) {
-            $query->where('status', '!=', 'maintenance')
-                ->whereDoesntHave('assignments', function($q) {
-                    $q->where('status', 'active');
-                })
-                ->orWhere('status', 'available');
-        });
+        // Get available rooms - rooms that are not in maintenance and haven't reached capacity
+        $rooms = Room::where('status', '!=', 'maintenance')
+            ->where('status', '!=', 'occupied')
+            ->whereRaw('(SELECT COUNT(*) FROM room_assignments WHERE room_assignments.room_id = rooms.id AND room_assignments.status = "active") < rooms.capacity');
 
         // If room_id is provided, ensure that room is included regardless of status
         if ($request->has('room_id')) {
             $rooms = $rooms->orWhere('id', $request->room_id);
         }
 
-        $rooms = $rooms->get();
+        $rooms = $rooms->orderBy('room_number')->get();
 
         // Get tenants who don't have active assignments
-        $tenants = Tenant::whereDoesntHave('roomAssignments', function($query) {
+        $tenants = Tenant::with('user')->whereDoesntHave('roomAssignments', function($query) {
             $query->where('status', 'active');
-        })->get();
+        })->orderBy('first_name')->get();
         
         // Get the selected room for pre-filling if provided
         $selectedRoom = $request->has('room_id') ? Room::find($request->room_id) : null;
@@ -74,13 +70,16 @@ class RoomAssignmentController extends Controller
         try {
             DB::beginTransaction();
 
-            // Check if room is available
-            $isRoomAvailable = !RoomAssignment::where('room_id', $validated['room_id'])
+            // Get room details to check capacity
+            $room = Room::find($validated['room_id']);
+            
+            // Check current occupancy vs capacity
+            $currentAssignments = RoomAssignment::where('room_id', $validated['room_id'])
                 ->where('status', 'active')
-                ->exists();
+                ->count();
 
-            if (!$isRoomAvailable) {
-                return back()->withErrors(['room_id' => 'Room is currently occupied.'])->withInput();
+            if ($currentAssignments >= $room->capacity) {
+                return back()->withErrors(['room_id' => 'Room has reached maximum capacity (' . $room->capacity . ' tenants).'])->withInput();
             }
 
             // Check if tenant already has an active assignment
@@ -97,11 +96,13 @@ class RoomAssignmentController extends Controller
                 'status' => 'active'
             ]));
 
-            // Update room status and increment occupants
-            $room = Room::find($validated['room_id']);
+            // Update room status and current occupants count
+            $newOccupantCount = $currentAssignments + 1;
+            $newStatus = ($newOccupantCount >= $room->capacity) ? 'occupied' : 'available';
+            
             $room->update([
-                'status' => 'occupied',
-                'current_occupants' => $room->getCurrentOccupantsAttribute()
+                'status' => $newStatus,
+                'current_occupants' => $newOccupantCount
             ]);
 
             DB::commit();
@@ -218,16 +219,20 @@ class RoomAssignmentController extends Controller
         try {
             DB::beginTransaction();
 
-            // Only make room available if the assignment was active
+            // Only update room status if the assignment was active
             if ($roomAssignment->status === 'active') {
                 $room = Room::find($roomAssignment->room_id);
-                $remainingAssignments = $room->currentAssignments()->count();
+                $remainingAssignments = $room->assignments()->where('status', 'active')->where('id', '!=', $roomAssignment->id)->count();
                 
-                // If this was the last active assignment, make room available
-                if ($remainingAssignments <= 1) {
+                // Update room status and occupancy
+                if ($remainingAssignments === 0) {
                     $room->update([
                         'status' => 'available',
                         'current_occupants' => 0
+                    ]);
+                } else {
+                    $room->update([
+                        'current_occupants' => $remainingAssignments
                     ]);
                 }
             }

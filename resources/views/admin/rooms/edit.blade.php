@@ -17,14 +17,20 @@
                             <!-- Room Number -->
                             <div>
                                 <x-input-label for="room_number" :value="__('Room Number')" />
-                                <x-text-input id="room_number" class="block mt-1 w-full" type="text" name="room_number" :value="old('room_number', $room->room_number)" required />
+                                <x-text-input id="room_number" class="block mt-1 w-full" type="text" name="room_number" :value="old('room_number', $room->room_number)" 
+                                    pattern="[a-zA-Z0-9]+" title="Only letters and numbers are allowed" 
+                                    oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')" required />
                                 <x-input-error :messages="$errors->get('room_number')" class="mt-2" />
                             </div>
 
                             <!-- Type -->
                             <div>
                                 <x-input-label for="type" :value="__('Room Type')" />
-                                <x-text-input id="type" class="block mt-1 w-full" type="text" name="type" :value="old('type', $room->type)" required />
+                                <select id="type" name="type" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required onchange="updateCapacity()">
+                                    <option value="">Select Room Type</option>
+                                    <option value="Single Bedroom" {{ old('type', $room->type) === 'Single Bedroom' ? 'selected' : '' }}>Single Bedroom</option>
+                                    <option value="Double Bedroom" {{ old('type', $room->type) === 'Double Bedroom' ? 'selected' : '' }}>Double Bedroom</option>
+                                </select>
                                 <x-input-error :messages="$errors->get('type')" class="mt-2" />
                             </div>
 
@@ -38,10 +44,7 @@
                             <!-- Capacity -->
                             <div>
                                 <x-input-label for="capacity" :value="__('Capacity')" />
-                                <select id="capacity" name="capacity" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                    <option value="1" {{ $room->capacity === 1 ? 'selected' : '' }}>1 Person</option>
-                                    <option value="2" {{ $room->capacity === 2 ? 'selected' : '' }}>2 Persons</option>
-                                </select>
+                                <x-text-input id="capacity" name="capacity" class="block mt-1 w-full bg-gray-100" type="number" :value="old('capacity', $room->capacity)" readonly />
                                 <x-input-error :messages="$errors->get('capacity')" class="mt-2" />
                             </div>
 
@@ -78,4 +81,24 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function updateCapacity() {
+            const typeSelect = document.getElementById('type');
+            const capacityInput = document.getElementById('capacity');
+            
+            if (typeSelect.value === 'Single Bedroom') {
+                capacityInput.value = 1;
+            } else if (typeSelect.value === 'Double Bedroom') {
+                capacityInput.value = 2;
+            } else {
+                capacityInput.value = '';
+            }
+        }
+        
+        // Auto-update capacity on page load if type is already selected
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCapacity();
+        });
+    </script>
 </x-app-layout>

@@ -19,35 +19,42 @@
 
                                 <div>
                                     <x-input-label for="first_name" :value="__('First Name')" />
-                                    <x-text-input id="first_name" class="block mt-1 w-full" type="text" name="first_name" :value="old('first_name')" required />
+                                    <x-text-input id="first_name" class="block mt-1 w-full" type="text" name="first_name" :value="old('first_name')" required 
+                                                  pattern="[a-zA-Z\s]+" title="Only letters and spaces allowed"
+                                                  oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" />
                                     <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
                                 </div>
 
                                 <div>
                                     <x-input-label for="middle_name" :value="__('Middle Name')" />
-                                    <x-text-input id="middle_name" class="block mt-1 w-full" type="text" name="middle_name" :value="old('middle_name')" />
+                                    <x-text-input id="middle_name" class="block mt-1 w-full" type="text" name="middle_name" :value="old('middle_name')" 
+                                                  pattern="[a-zA-Z\s]*" title="Only letters and spaces allowed"
+                                                  oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" />
                                     <x-input-error :messages="$errors->get('middle_name')" class="mt-2" />
                                 </div>
 
                                 <div>
                                     <x-input-label for="last_name" :value="__('Last Name')" />
-                                    <x-text-input id="last_name" class="block mt-1 w-full" type="text" name="last_name" :value="old('last_name')" required />
+                                    <x-text-input id="last_name" class="block mt-1 w-full" type="text" name="last_name" :value="old('last_name')" required 
+                                                  pattern="[a-zA-Z\s]+" title="Only letters and spaces allowed"
+                                                  oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" />
                                     <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
                                 </div>
 
                                 <div>
                                     <x-input-label for="birth_date" :value="__('Birth Date')" />
-                                    <x-text-input id="birth_date" class="block mt-1 w-full" type="date" name="birth_date" :value="old('birth_date')" required />
+                                    <x-text-input id="birth_date" class="block mt-1 w-full" type="date" name="birth_date" :value="old('birth_date')" required 
+                                                  max="{{ now()->subYears(18)->format('Y-m-d') }}" />
+                                    <p class="mt-1 text-sm text-gray-500">Must be at least 18 years old</p>
                                     <x-input-error :messages="$errors->get('birth_date')" class="mt-2" />
                                 </div>
 
                                 <div>
                                     <x-input-label for="gender" :value="__('Gender')" />
-                                    <select id="gender" name="gender" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                        <option value="male" {{ old('gender') === 'male' ? 'selected' : '' }}>Male</option>
-                                        <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>Female</option>
-                                        <option value="other" {{ old('gender') === 'other' ? 'selected' : '' }}>Other</option>
-                                    </select>
+                                    <div class="mt-1 p-3 bg-gray-100 rounded-md">
+                                        <span class="text-sm text-gray-700">Female</span>
+                                        <input type="hidden" name="gender" value="female" />
+                                    </div>
                                     <x-input-error :messages="$errors->get('gender')" class="mt-2" />
                                 </div>
 
@@ -64,10 +71,18 @@
                                 </div>
 
                                 <div>
-                                    <x-input-label for="civil_status" :value="__('Civil Status')" />
-                                    <x-text-input id="civil_status" class="block mt-1 w-full" type="text" name="civil_status" :value="old('civil_status')" required />
-                                    <x-input-error :messages="$errors->get('civil_status')" class="mt-2" />
+                                    <x-input-label for="university" :value="__('University')" />
+                                    <x-text-input id="university" class="block mt-1 w-full" type="text" name="university" :value="old('university')" required />
+                                    <x-input-error :messages="$errors->get('university')" class="mt-2" />
                                 </div>
+
+                                <div>
+                                    <x-input-label for="course" :value="__('Course')" />
+                                    <x-text-input id="course" class="block mt-1 w-full" type="text" name="course" :value="old('course')" required />
+                                    <x-input-error :messages="$errors->get('course')" class="mt-2" />
+                                </div>
+
+
                             </div>
 
                             <!-- Contact Details Section -->
@@ -76,13 +91,19 @@
 
                                 <div>
                                     <x-input-label for="phone_number" :value="__('Phone Number')" />
-                                    <x-text-input id="phone_number" class="block mt-1 w-full" type="text" name="phone_number" :value="old('phone_number')" required />
+                                    <x-text-input id="phone_number" class="block mt-1 w-full" type="text" name="phone_number" :value="old('phone_number')" required 
+                                                  pattern="[0-9]{10,11}" maxlength="11" 
+                                                  placeholder="10-11 digits (e.g., 09171234567)" 
+                                                  oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                                     <x-input-error :messages="$errors->get('phone_number')" class="mt-2" />
                                 </div>
 
                                 <div>
                                     <x-input-label for="alternative_phone" :value="__('Alternative Phone')" />
-                                    <x-text-input id="alternative_phone" class="block mt-1 w-full" type="text" name="alternative_phone" :value="old('alternative_phone')" />
+                                    <x-text-input id="alternative_phone" class="block mt-1 w-full" type="text" name="alternative_phone" :value="old('alternative_phone')" 
+                                                  pattern="[0-9]{10,11}" maxlength="11" 
+                                                  placeholder="10-11 digits (optional)" 
+                                                  oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                                     <x-input-error :messages="$errors->get('alternative_phone')" class="mt-2" />
                                 </div>
 
@@ -93,9 +114,9 @@
                                 </div>
 
                                 <div>
-                                    <x-input-label for="permanent_address" :value="__('Permanent Address')" />
-                                    <textarea id="permanent_address" name="permanent_address" rows="3" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>{{ old('permanent_address') }}</textarea>
-                                    <x-input-error :messages="$errors->get('permanent_address')" class="mt-2" />
+                                    <x-input-label for="provincial_address" :value="__('Provincial Address')" />
+                                    <textarea id="provincial_address" name="provincial_address" rows="3" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>{{ old('provincial_address') }}</textarea>
+                                    <x-input-error :messages="$errors->get('provincial_address')" class="mt-2" />
                                 </div>
 
                                 <div>
@@ -111,7 +132,21 @@
 
                                 <div>
                                     <x-input-label for="id_type" :value="__('ID Type')" />
-                                    <x-text-input id="id_type" class="block mt-1 w-full" type="text" name="id_type" :value="old('id_type')" required />
+                                    <select id="id_type" name="id_type" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                        <option value="">Select ID Type</option>
+                                        <option value="drivers_license" {{ old('id_type') === 'drivers_license' ? 'selected' : '' }}>Driver's License</option>
+                                        <option value="passport" {{ old('id_type') === 'passport' ? 'selected' : '' }}>Passport</option>
+                                        <option value="national_id" {{ old('id_type') === 'national_id' ? 'selected' : '' }}>National ID</option>
+                                        <option value="voters_id" {{ old('id_type') === 'voters_id' ? 'selected' : '' }}>Voter's ID</option>
+                                        <option value="tin_id" {{ old('id_type') === 'tin_id' ? 'selected' : '' }}>TIN ID</option>
+                                        <option value="sss_id" {{ old('id_type') === 'sss_id' ? 'selected' : '' }}>SSS ID</option>
+                                        <option value="philhealth_id" {{ old('id_type') === 'philhealth_id' ? 'selected' : '' }}>PhilHealth ID</option>
+                                        <option value="pag_ibig_id" {{ old('id_type') === 'pag_ibig_id' ? 'selected' : '' }}>Pag-IBIG ID</option>
+                                        <option value="postal_id" {{ old('id_type') === 'postal_id' ? 'selected' : '' }}>Postal ID</option>
+                                        <option value="barangay_id" {{ old('id_type') === 'barangay_id' ? 'selected' : '' }}>Barangay ID</option>
+                                        <option value="senior_citizen_id" {{ old('id_type') === 'senior_citizen_id' ? 'selected' : '' }}>Senior Citizen ID</option>
+                                        <option value="pwd_id" {{ old('id_type') === 'pwd_id' ? 'selected' : '' }}>PWD ID</option>
+                                    </select>
                                     <x-input-error :messages="$errors->get('id_type')" class="mt-2" />
                                 </div>
 
@@ -145,6 +180,12 @@
                                 </div>
 
                                 <div>
+                                    <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+                                    <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required />
+                                    <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                                </div>
+
+                                <div>
                                     <x-input-label for="remarks" :value="__('Remarks')" />
                                     <textarea id="remarks" name="remarks" rows="3" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">{{ old('remarks') }}</textarea>
                                     <x-input-error :messages="$errors->get('remarks')" class="mt-2" />
@@ -160,7 +201,9 @@
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <x-input-label for="emergency_contacts[0][name]" :value="__('Name')" />
-                                            <x-text-input id="emergency_contacts[0][name]" class="block mt-1 w-full" type="text" name="emergency_contacts[0][name]" required />
+                                            <x-text-input id="emergency_contacts[0][name]" class="block mt-1 w-full" type="text" name="emergency_contacts[0][name]" 
+                                                pattern="[a-zA-Z\s]+" title="Only letters and spaces are allowed" 
+                                                oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" required />
                                         </div>
 
                                         <div>
@@ -170,12 +213,18 @@
 
                                         <div>
                                             <x-input-label for="emergency_contacts[0][phone_number]" :value="__('Phone Number')" />
-                                            <x-text-input id="emergency_contacts[0][phone_number]" class="block mt-1 w-full" type="text" name="emergency_contacts[0][phone_number]" required />
+                                            <x-text-input id="emergency_contacts[0][phone_number]" class="block mt-1 w-full" type="text" name="emergency_contacts[0][phone_number]" required 
+                                                          pattern="[0-9]{10,11}" maxlength="11" 
+                                                          placeholder="10-11 digits only"
+                                                          oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                                         </div>
 
                                         <div>
                                             <x-input-label for="emergency_contacts[0][alternative_phone]" :value="__('Alternative Phone')" />
-                                            <x-text-input id="emergency_contacts[0][alternative_phone]" class="block mt-1 w-full" type="text" name="emergency_contacts[0][alternative_phone]" />
+                                            <x-text-input id="emergency_contacts[0][alternative_phone]" class="block mt-1 w-full" type="text" name="emergency_contacts[0][alternative_phone]" 
+                                                          pattern="[0-9]{10,11}" maxlength="11" 
+                                                          placeholder="10-11 digits (optional)"
+                                                          oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                                         </div>
 
                                         <div>
@@ -218,32 +267,38 @@
                 <div class="border p-4 rounded-md mb-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <x-input-label for="emergency_contacts[${contactCount}][name]" :value="__('Name')" />
-                            <x-text-input id="emergency_contacts[${contactCount}][name]" class="block mt-1 w-full" type="text" name="emergency_contacts[${contactCount}][name]" required />
+                            <label for="emergency_contacts[${contactCount}][name]" class="block font-medium text-sm text-gray-700">Name</label>
+                            <input id="emergency_contacts[${contactCount}][name]" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" type="text" name="emergency_contacts[${contactCount}][name]" 
+                                pattern="[a-zA-Z\\s]+" title="Only letters and spaces are allowed" 
+                                oninput="this.value = this.value.replace(/[^a-zA-Z\\s]/g, '')" required />
                         </div>
 
                         <div>
-                            <x-input-label for="emergency_contacts[${contactCount}][relationship]" :value="__('Relationship')" />
-                            <x-text-input id="emergency_contacts[${contactCount}][relationship]" class="block mt-1 w-full" type="text" name="emergency_contacts[${contactCount}][relationship]" required />
+                            <label for="emergency_contacts[${contactCount}][relationship]" class="block font-medium text-sm text-gray-700">Relationship</label>
+                            <input id="emergency_contacts[${contactCount}][relationship]" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" type="text" name="emergency_contacts[${contactCount}][relationship]" required />
                         </div>
 
                         <div>
-                            <x-input-label for="emergency_contacts[${contactCount}][phone_number]" :value="__('Phone Number')" />
-                            <x-text-input id="emergency_contacts[${contactCount}][phone_number]" class="block mt-1 w-full" type="text" name="emergency_contacts[${contactCount}][phone_number]" required />
+                            <label for="emergency_contacts[${contactCount}][phone_number]" class="block font-medium text-sm text-gray-700">Phone Number</label>
+                            <input id="emergency_contacts[${contactCount}][phone_number]" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" type="text" name="emergency_contacts[${contactCount}][phone_number]" required 
+                                   pattern="[0-9]{10,11}" maxlength="11" placeholder="10-11 digits only"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                         </div>
 
                         <div>
-                            <x-input-label for="emergency_contacts[${contactCount}][alternative_phone]" :value="__('Alternative Phone')" />
-                            <x-text-input id="emergency_contacts[${contactCount}][alternative_phone]" class="block mt-1 w-full" type="text" name="emergency_contacts[${contactCount}][alternative_phone]" />
+                            <label for="emergency_contacts[${contactCount}][alternative_phone]" class="block font-medium text-sm text-gray-700">Alternative Phone</label>
+                            <input id="emergency_contacts[${contactCount}][alternative_phone]" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" type="text" name="emergency_contacts[${contactCount}][alternative_phone]" 
+                                   pattern="[0-9]{10,11}" maxlength="11" placeholder="10-11 digits (optional)"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                         </div>
 
                         <div>
-                            <x-input-label for="emergency_contacts[${contactCount}][email]" :value="__('Email')" />
-                            <x-text-input id="emergency_contacts[${contactCount}][email]" class="block mt-1 w-full" type="email" name="emergency_contacts[${contactCount}][email]" />
+                            <label for="emergency_contacts[${contactCount}][email]" class="block font-medium text-sm text-gray-700">Email</label>
+                            <input id="emergency_contacts[${contactCount}][email]" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" type="email" name="emergency_contacts[${contactCount}][email]" />
                         </div>
 
                         <div>
-                            <x-input-label for="emergency_contacts[${contactCount}][address]" :value="__('Address')" />
+                            <label for="emergency_contacts[${contactCount}][address]" class="block font-medium text-sm text-gray-700">Address</label>
                             <textarea id="emergency_contacts[${contactCount}][address]" name="emergency_contacts[${contactCount}][address]" rows="2" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required></textarea>
                         </div>
                     </div>

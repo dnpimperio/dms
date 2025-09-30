@@ -12,6 +12,9 @@ class Bill extends Model
     protected $fillable = [
         'tenant_id',
         'room_id',
+        'bill_type',
+        'description',
+        'details',
         'created_by',
         'bill_date',
         'room_rate',
@@ -23,6 +26,7 @@ class Bill extends Model
         'status',
         'amount_paid',
         'due_date',
+        'amount',
     ];
 
     protected $casts = [
@@ -34,6 +38,8 @@ class Bill extends Model
         'other_charges' => 'decimal:2',
         'total_amount' => 'decimal:2',
         'amount_paid' => 'decimal:2',
+        'amount' => 'decimal:2',
+        'details' => 'array',
     ];
 
     public function tenant()
@@ -49,5 +55,29 @@ class Bill extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Get the utility readings associated with this bill.
+     */
+    public function utilityReadings()
+    {
+        return $this->hasMany(UtilityReading::class, 'bill_id');
+    }
+
+    /**
+     * Scope a query to only include utility bills.
+     */
+    public function scopeUtility($query)
+    {
+        return $query->where('bill_type', 'utility');
+    }
+
+    /**
+     * Scope a query to only include room bills.
+     */
+    public function scopeRoom($query)
+    {
+        return $query->where('bill_type', 'room');
     }
 }

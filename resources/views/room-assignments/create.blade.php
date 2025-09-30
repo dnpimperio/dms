@@ -26,7 +26,10 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Room Selection -->
                             <div class="md:col-span-2">
-                                <label for="room_id" class="block text-sm font-medium text-gray-700 mb-2">Room</label>
+                                <label for="room_id" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Room 
+                                    <span class="text-sm text-gray-500">({{ $rooms->count() }} available rooms)</span>
+                                </label>
                                 <select name="room_id" id="room_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('room_id') border-red-300 @enderror" required>
                                     <option value="">Select Room</option>
                                     @foreach($rooms as $room)
@@ -34,29 +37,58 @@
                                                 data-price="{{ $room->rate }}"
                                                 {{ (old('room_id', $selectedRoom?->id) == $room->id) ? 'selected' : '' }}>
                                             Room {{ $room->room_number }} - {{ $room->type }}
-                                            (₱{{ number_format($room->rate, 2) }}/month)
+                                            ({{ $room->current_occupants ?? 0 }}/{{ $room->capacity }} occupied, ₱{{ number_format($room->rate, 2) }}/month)
                                         </option>
                                     @endforeach
                                 </select>
                                 @error('room_id')
                                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
+                                @if($rooms->count() == 0)
+                                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                                        <p class="text-sm text-amber-700 mb-2">No rooms available for assignment. All rooms may be occupied or in maintenance.</p>
+                                        <a href="{{ route('admin.rooms.create') }}" class="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-600 bg-indigo-100 border border-indigo-200 rounded hover:bg-indigo-200">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                            </svg>
+                                            Create New Room
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
 
                             <!-- Tenant Selection -->
                             <div class="md:col-span-2">
-                                <label for="tenant_id" class="block text-sm font-medium text-gray-700 mb-2">Tenant</label>
+                                <label for="tenant_id" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Tenant
+                                    <span class="text-sm text-gray-500">({{ $tenants->count() }} available tenants)</span>
+                                </label>
                                 <select name="tenant_id" id="tenant_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('tenant_id') border-red-300 @enderror" required>
                                     <option value="">Select Tenant</option>
                                     @foreach($tenants as $tenant)
                                         <option value="{{ $tenant->id }}" {{ old('tenant_id') == $tenant->id ? 'selected' : '' }}>
-                                            {{ $tenant->name }} ({{ $tenant->email }})
+                                            {{ $tenant->full_name }}@if($tenant->user) ({{ $tenant->user->email }})@endif
                                         </option>
                                     @endforeach
                                 </select>
                                 @error('tenant_id')
                                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
+                                @if($tenants->count() == 0)
+                                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                                        <p class="text-sm text-amber-700 mb-2">No tenants available for assignment. This could mean:</p>
+                                        <ul class="text-sm text-amber-700 list-disc list-inside mb-2 space-y-1">
+                                            <li>All tenants already have active room assignments</li>
+                                            <li>No tenants have been created yet</li>
+                                        </ul>
+                                        <a href="{{ route('admin.tenants.create') }}" class="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-600 bg-indigo-100 border border-indigo-200 rounded hover:bg-indigo-200">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                            </svg>
+                                            Create New Tenant
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
 
                             <!-- Start Date -->

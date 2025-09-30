@@ -56,6 +56,23 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.bills.generate-monthly');
         Route::patch('bills/{bill}/update-payment', [\App\Http\Controllers\Admin\BillController::class, 'updatePayment'])
             ->name('admin.bills.update-payment');
+        
+        // Utility Management routes
+        Route::resource('utility-types', \App\Http\Controllers\Admin\UtilityTypeController::class)->names('admin.utility-types');
+        Route::resource('utility-rates', \App\Http\Controllers\Admin\UtilityRateController::class)->names('admin.utility-rates');
+        Route::resource('utility-readings', \App\Http\Controllers\Admin\UtilityReadingController::class)->names('admin.utility-readings');
+        Route::get('utility-readings/previous-reading', [\App\Http\Controllers\Admin\UtilityReadingController::class, 'getPreviousReading'])
+            ->name('admin.utility-readings.previous-reading');
+        
+        // Utility Billing routes
+        Route::get('utility-billing', [\App\Http\Controllers\Admin\UtilityBillingController::class, 'index'])
+            ->name('admin.utility-billing.index');
+        Route::get('utility-billing/generate', [\App\Http\Controllers\Admin\UtilityBillingController::class, 'showGenerateForm'])
+            ->name('admin.utility-billing.generate');
+        Route::post('utility-billing/generate', [\App\Http\Controllers\Admin\UtilityBillingController::class, 'generateBills'])
+            ->name('admin.utility-billing.generate.post');
+        Route::get('utility-billing/calculate-consumption', [\App\Http\Controllers\Admin\UtilityBillingController::class, 'calculateConsumption'])
+            ->name('admin.utility-billing.calculate-consumption');
     });
 
     // Tenant routes

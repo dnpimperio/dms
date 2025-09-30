@@ -74,8 +74,8 @@ class RoomController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'room_number' => ['required', 'string', 'max:255', 'unique:rooms'],
-            'type' => ['required', 'string', 'max:255'],
+            'room_number' => ['required', 'string', 'max:255', 'unique:rooms', 'regex:/^[a-zA-Z0-9]+$/'],
+            'type' => ['required', 'string', 'max:255', Rule::in(['Single Bedroom', 'Double Bedroom'])],
             'rate' => ['required', 'numeric', 'min:0'],
             'capacity' => ['required', 'integer', 'min:1', 'max:2'],
             'status' => ['required', Rule::in(['available', 'reserved', 'occupied', 'maintenance'])],
@@ -122,8 +122,8 @@ class RoomController extends Controller
     public function update(Request $request, Room $room)
     {
         $request->validate([
-            'room_number' => ['required', 'string', 'max:255', Rule::unique('rooms')->ignore($room->id)],
-            'type' => ['required', 'string', 'max:255'],
+            'room_number' => ['required', 'string', 'max:255', Rule::unique('rooms')->ignore($room->id), 'regex:/^[a-zA-Z0-9]+$/'],
+            'type' => ['required', 'string', 'max:255', Rule::in(['Single Bedroom', 'Double Bedroom'])],
             'rate' => ['required', 'numeric', 'min:0'],
             'capacity' => ['required', 'integer', 'min:1', 'max:2'],
             'status' => ['required', Rule::in(['available', 'reserved', 'occupied', 'maintenance'])],
@@ -144,8 +144,11 @@ class RoomController extends Controller
      */
     public function destroy(Room $room)
     {
-        if ($room->status === 'occupied') {
-            return back()->with('error', 'Cannot delete an occupied room.');
+        // Check for active assignments instead of just status
+        $activeAssignments = $room->assignments()->where('status', 'active')->count();
+        
+        if ($activeAssignments > 0) {
+            return back()->with('error', 'Cannot delete room with active assignments. Please end or delete assignments first.');
         }
 
         $room->delete();

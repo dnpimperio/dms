@@ -48,36 +48,43 @@ class TenantController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'middle_name' => ['nullable', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'birth_date' => ['required', 'date'],
-            'gender' => ['required', Rule::in(['male', 'female', 'other'])],
+            'first_name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'regex:/^[a-zA-Z\s]+$/', 'max:255'],
+            'last_name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/', 'max:255'],
+            'birth_date' => ['required', 'date', 'before:today', 'before_or_equal:' . now()->subYears(18)->format('Y-m-d')],
+            'gender' => ['required', Rule::in(['female'])], // Female dormitory only
             'nationality' => ['required', 'string', 'max:255'],
             'occupation' => ['required', 'string', 'max:255'],
-            'civil_status' => ['required', 'string', 'max:255'],
-            'phone_number' => ['required', 'string', 'max:255'],
-            'alternative_phone' => ['nullable', 'string', 'max:255'],
-            'personal_email' => ['required', 'string', 'email', 'max:255', 'unique:tenants'],
-            'permanent_address' => ['required', 'string'],
-            'current_address' => ['nullable', 'string'],
-            'id_type' => ['required', 'string', 'max:255'],
-            'id_number' => ['required', 'string', 'max:255'],
-            'id_image' => ['required', 'image', 'max:2048'],
-            'remarks' => ['nullable', 'string'],
+            'university' => ['required', 'string', 'max:255'],
+            'course' => ['required', 'string', 'max:255'],
+            'phone_number' => ['required', 'string', 'regex:/^[0-9]{10,11}$/', 'unique:tenants,phone_number'],
+            'alternative_phone' => ['nullable', 'string', 'regex:/^[0-9]{10,11}$/'],
+            'personal_email' => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:tenants,personal_email'],
+            'provincial_address' => ['required', 'string', 'max:500'],
+            'current_address' => ['nullable', 'string', 'max:500'],
+            'id_type' => ['required', Rule::in(['drivers_license', 'passport', 'national_id', 'voters_id', 'tin_id', 'sss_id', 'philhealth_id', 'pag_ibig_id', 'postal_id', 'barangay_id', 'senior_citizen_id', 'pwd_id'])],
+            'id_number' => ['required', 'string', 'max:255', 'unique:tenants,id_number'],
+            'id_image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'remarks' => ['nullable', 'string', 'max:1000'],
             
             // User account information
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
 
             // Emergency contacts
-            'emergency_contacts' => ['required', 'array', 'min:1'],
-            'emergency_contacts.*.name' => ['required', 'string', 'max:255'],
+            'emergency_contacts' => ['required', 'array', 'min:1', 'max:3'],
+            'emergency_contacts.*.name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/', 'max:255'],
             'emergency_contacts.*.relationship' => ['required', 'string', 'max:255'],
-            'emergency_contacts.*.phone_number' => ['required', 'string', 'max:255'],
-            'emergency_contacts.*.alternative_phone' => ['nullable', 'string', 'max:255'],
-            'emergency_contacts.*.email' => ['nullable', 'string', 'email', 'max:255'],
-            'emergency_contacts.*.address' => ['required', 'string'],
+            'emergency_contacts.*.phone_number' => ['required', 'string', 'regex:/^[0-9]{10,11}$/'],
+            'emergency_contacts.*.alternative_phone' => ['nullable', 'string', 'regex:/^[0-9]{10,11}$/'],
+            'emergency_contacts.*.email' => ['nullable', 'string', 'email:rfc,dns', 'max:255'],
+            'emergency_contacts.*.address' => ['required', 'string', 'max:500'],
+        ], [
+            'birth_date.before_or_equal' => 'Tenant must be at least 18 years old.',
+            'first_name.regex' => 'First name must only contain letters and spaces.',
+            'middle_name.regex' => 'Middle name must only contain letters and spaces.',
+            'last_name.regex' => 'Last name must only contain letters and spaces.',
+            'emergency_contacts.*.name.regex' => 'Emergency contact name must only contain letters and spaces.',
         ]);
 
         try {
@@ -92,20 +99,39 @@ class TenantController extends Controller
                 'status' => 'active'
             ]);
 
-            // Store ID image
-            $idImagePath = $request->file('id_image')->store('tenant-ids', 'public');
+            // Store ID image with better error handling
+            $idImagePath = null;
+            if ($request->hasFile('id_image')) {
+                $file = $request->file('id_image');
+                if ($file->isValid()) {
+                    // Create filename with timestamp to avoid conflicts
+                    $filename = time() . '_' . $user->id . '.' . $file->getClientOriginalExtension();
+                    $idImagePath = $file->storeAs('tenant-ids', $filename, 'public');
+                    
+                    if (!$idImagePath) {
+                        throw new \Exception('Failed to store ID image');
+                    }
+                } else {
+                    throw new \Exception('Invalid ID image file');
+                }
+            } else {
+                throw new \Exception('No ID image file received');
+            }
 
             // Create tenant profile
             $tenant = Tenant::create(array_merge(
                 $request->except(['email', 'password', 'emergency_contacts', 'id_image']),
                 [
                     'user_id' => $user->id,
-                    'id_image_path' => $idImagePath
+                    'id_image_path' => $idImagePath,
+                    'gender' => 'female' // Force gender to female for female dormitory
                 ]
             ));
 
             // Create emergency contacts
-            $tenant->emergencyContacts()->createMany($request->emergency_contacts);
+            if ($request->has('emergency_contacts') && is_array($request->emergency_contacts)) {
+                $tenant->emergencyContacts()->createMany($request->emergency_contacts);
+            }
 
             DB::commit();
             return redirect()->route('admin.tenants.index')
@@ -113,8 +139,11 @@ class TenantController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Storage::disk('public')->delete($idImagePath ?? '');
-            return back()->with('error', 'Error creating tenant profile. ' . $e->getMessage())
+            // Clean up uploaded file if it exists
+            if ($idImagePath && Storage::disk('public')->exists($idImagePath)) {
+                Storage::disk('public')->delete($idImagePath);
+            }
+            return back()->with('error', 'Error creating tenant profile: ' . $e->getMessage())
                 ->withInput();
         }
     }
@@ -153,36 +182,43 @@ class TenantController extends Controller
     public function update(Request $request, Tenant $tenant)
     {
         $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'middle_name' => ['nullable', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'birth_date' => ['required', 'date'],
-            'gender' => ['required', Rule::in(['male', 'female', 'other'])],
+            'first_name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'regex:/^[a-zA-Z\s]+$/', 'max:255'],
+            'last_name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/', 'max:255'],
+            'birth_date' => ['required', 'date', 'before:today', 'before_or_equal:' . now()->subYears(18)->format('Y-m-d')],
+            'gender' => ['required', Rule::in(['female'])], // Female dormitory only
             'nationality' => ['required', 'string', 'max:255'],
             'occupation' => ['required', 'string', 'max:255'],
-            'civil_status' => ['required', 'string', 'max:255'],
-            'phone_number' => ['required', 'string', 'max:255'],
-            'alternative_phone' => ['nullable', 'string', 'max:255'],
-            'personal_email' => ['required', 'string', 'email', 'max:255', Rule::unique('tenants')->ignore($tenant->id)],
-            'permanent_address' => ['required', 'string'],
-            'current_address' => ['nullable', 'string'],
-            'id_type' => ['required', 'string', 'max:255'],
-            'id_number' => ['required', 'string', 'max:255'],
-            'id_image' => ['nullable', 'image', 'max:2048'],
-            'remarks' => ['nullable', 'string'],
+            'university' => ['required', 'string', 'max:255'],
+            'course' => ['required', 'string', 'max:255'],
+            'phone_number' => ['required', 'string', 'regex:/^[0-9]{10,11}$/', Rule::unique('tenants', 'phone_number')->ignore($tenant->id)],
+            'alternative_phone' => ['nullable', 'string', 'regex:/^[0-9]{10,11}$/'],
+            'personal_email' => ['required', 'string', 'email:rfc,dns', 'max:255', Rule::unique('tenants', 'personal_email')->ignore($tenant->id)],
+            'provincial_address' => ['required', 'string', 'max:500'],
+            'current_address' => ['nullable', 'string', 'max:500'],
+            'id_type' => ['required', Rule::in(['drivers_license', 'passport', 'national_id', 'voters_id', 'tin_id', 'sss_id', 'philhealth_id', 'pag_ibig_id', 'postal_id', 'barangay_id', 'senior_citizen_id', 'pwd_id'])],
+            'id_number' => ['required', 'string', 'max:255', Rule::unique('tenants', 'id_number')->ignore($tenant->id)],
+            'id_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'remarks' => ['nullable', 'string', 'max:1000'],
             
             // User account information
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($tenant->user_id)],
-            'password' => ['nullable', 'string', 'min:8'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'max:255', Rule::unique('users', 'email')->ignore($tenant->user_id)],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
 
             // Emergency contacts
-            'emergency_contacts' => ['required', 'array', 'min:1'],
-            'emergency_contacts.*.name' => ['required', 'string', 'max:255'],
+            'emergency_contacts' => ['required', 'array', 'min:1', 'max:3'],
+            'emergency_contacts.*.name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/', 'max:255'],
             'emergency_contacts.*.relationship' => ['required', 'string', 'max:255'],
-            'emergency_contacts.*.phone_number' => ['required', 'string', 'max:255'],
-            'emergency_contacts.*.alternative_phone' => ['nullable', 'string', 'max:255'],
-            'emergency_contacts.*.email' => ['nullable', 'string', 'email', 'max:255'],
-            'emergency_contacts.*.address' => ['required', 'string'],
+            'emergency_contacts.*.phone_number' => ['required', 'string', 'regex:/^[0-9]{10,11}$/'],
+            'emergency_contacts.*.alternative_phone' => ['nullable', 'string', 'regex:/^[0-9]{10,11}$/'],
+            'emergency_contacts.*.email' => ['nullable', 'string', 'email:rfc,dns', 'max:255'],
+            'emergency_contacts.*.address' => ['required', 'string', 'max:500'],
+        ], [
+            'birth_date.before_or_equal' => 'Tenant must be at least 18 years old.',
+            'first_name.regex' => 'First name must only contain letters and spaces.',
+            'middle_name.regex' => 'Middle name must only contain letters and spaces.',
+            'last_name.regex' => 'Last name must only contain letters and spaces.',
+            'emergency_contacts.*.name.regex' => 'Emergency contact name must only contain letters and spaces.',
         ]);
 
         try {

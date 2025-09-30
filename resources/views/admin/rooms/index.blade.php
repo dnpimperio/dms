@@ -4,9 +4,17 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Room Management') }}
             </h2>
-            <a href="{{ route('admin.rooms.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
-                Add New Room
-            </a>
+            <div class="flex space-x-3">
+                <a href="{{ route('room-assignments.index') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                    Room Assignments
+                </a>
+                <a href="{{ route('admin.rooms.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                    Add New Room
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -23,6 +31,14 @@
                             Apply Filters
                         </button>
                     </form>
+                </div>
+                <div>
+                    <a href="{{ route('room-assignments.index') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                        Room Assignments
+                    </a>
                 </div>
             </div>
             
@@ -77,16 +93,16 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $room->current_occupants }}/{{ $room->capacity }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <form action="{{ route('admin.rooms.toggle-status', $room) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="px-2 py-1 text-xs font-semibold rounded-full {{ 
-                                                    $room->status === 'available' ? 'bg-green-100 text-green-800 hover:bg-green-200' : 
-                                                    'bg-red-100 text-red-800 hover:bg-red-200'
-                                                }}">
-                                                    {{ $room->status === 'available' ? 'Available' : 'Unavailable' }}
-                                                </button>
-                                            </form>
+                                            <span class="px-2 py-1 text-xs font-semibold rounded-full {{ 
+                                                $room->status === 'available' ? 'bg-green-100 text-green-800' : 
+                                                ($room->status === 'occupied' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')
+                                            }}">
+                                                @if($room->status === 'available' && ($room->current_occupants ?? 0) > 0)
+                                                    Partially Occupied
+                                                @else
+                                                    {{ ucfirst($room->status) }}
+                                                @endif
+                                            </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div class="flex items-center space-x-2">
@@ -123,6 +139,29 @@
                                                         @endif
                                                     </button>
                                                 </form>
+                                                @if($room->status === 'available' && ($room->current_occupants ?? 0) < $room->capacity)
+                                                <a href="{{ route('room-assignments.create', ['room_id' => $room->id]) }}" 
+                                                   class="inline-flex items-center p-2 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-full transition duration-150 ease-in-out"
+                                                   title="Add Tenant ({{ $room->current_occupants ?? 0 }}/{{ $room->capacity }})">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                    </svg>
+                                                </a>
+                                                @endif
+                                                @if($room->status !== 'occupied')
+                                                <form action="{{ route('admin.rooms.destroy', $room) }}" method="POST" class="inline" 
+                                                      onsubmit="return confirm('Are you sure you want to delete this room? This action cannot be undone.')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            class="inline-flex items-center p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-full transition duration-150 ease-in-out"
+                                                            title="Delete Room">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
