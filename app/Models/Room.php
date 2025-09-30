@@ -11,44 +11,24 @@ class Room extends Model
 
     protected $fillable = [
         'room_number',
-        'type',
-        'rate',
+        'room_type',
         'capacity',
-        'current_occupants',
+        'price',
         'status',
         'description',
-        'hidden'
+        'amenities',
     ];
 
     protected $casts = [
-        'rate' => 'decimal:2',
-        'capacity' => 'integer',
-        'current_occupants' => 'integer'
+        'price' => 'decimal:2',
+        'amenities' => 'array',
     ];
 
-    public function isAvailable()
+    // Relationships
+    public function currentTenant()
     {
-        return $this->status === 'available';
-    }
-
-    public function isOccupied()
-    {
-        return $this->status === 'occupied';
-    }
-
-    public function isReserved()
-    {
-        return $this->status === 'reserved';
-    }
-
-    public function isUnderMaintenance()
-    {
-        return $this->status === 'maintenance';
-    }
-
-    public function hasSpace()
-    {
-        return $this->current_occupants < $this->capacity;
+        // For now, let's use a simple approach - we'll enhance this later when we have proper room assignments
+        return $this->belongsTo(Tenant::class, 'current_tenant_id');
     }
 
     public function assignments()
@@ -56,13 +36,13 @@ class Room extends Model
         return $this->hasMany(RoomAssignment::class);
     }
 
-    public function currentAssignments()
+    public function bills()
     {
-        return $this->hasMany(RoomAssignment::class)->where('status', 'active');
+        return $this->hasMany(Bill::class);
     }
 
-    public function getCurrentOccupantsAttribute()
+    public function utilityReadings()
     {
-        return $this->currentAssignments()->count();
+        return $this->hasMany(UtilityReading::class);
     }
 }

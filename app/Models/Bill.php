@@ -13,71 +13,27 @@ class Bill extends Model
         'tenant_id',
         'room_id',
         'bill_type',
-        'description',
-        'details',
-        'created_by',
-        'bill_date',
-        'room_rate',
-        'electricity',
-        'water',
-        'other_charges',
-        'other_charges_description',
-        'total_amount',
-        'status',
-        'amount_paid',
-        'due_date',
         'amount',
+        'due_date',
+        'status',
+        'description',
+        'paid_at',
     ];
 
     protected $casts = [
-        'bill_date' => 'date',
         'due_date' => 'date',
-        'room_rate' => 'decimal:2',
-        'electricity' => 'decimal:2',
-        'water' => 'decimal:2',
-        'other_charges' => 'decimal:2',
-        'total_amount' => 'decimal:2',
-        'amount_paid' => 'decimal:2',
+        'paid_at' => 'datetime',
         'amount' => 'decimal:2',
-        'details' => 'array',
     ];
 
+    // Relationships
     public function tenant()
     {
-        return $this->belongsTo(User::class, 'tenant_id');
+        return $this->belongsTo(Tenant::class);
     }
 
     public function room()
     {
         return $this->belongsTo(Room::class);
-    }
-
-    public function creator()
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
-    /**
-     * Get the utility readings associated with this bill.
-     */
-    public function utilityReadings()
-    {
-        return $this->hasMany(UtilityReading::class, 'bill_id');
-    }
-
-    /**
-     * Scope a query to only include utility bills.
-     */
-    public function scopeUtility($query)
-    {
-        return $query->where('bill_type', 'utility');
-    }
-
-    /**
-     * Scope a query to only include room bills.
-     */
-    public function scopeRoom($query)
-    {
-        return $query->where('bill_type', 'room');
     }
 }

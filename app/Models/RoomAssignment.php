@@ -2,55 +2,41 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RoomAssignment extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'room_id',
         'tenant_id',
+        'room_id',
         'start_date',
         'end_date',
-        'monthly_rent',
-        'status',
-        'notes',
+        'is_active',
+        'assigned_by',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
-        'monthly_rent' => 'decimal:2',
+        'is_active' => 'boolean',
     ];
 
-    public function room(): BelongsTo
-    {
-        return $this->belongsTo(Room::class);
-    }
-
-    public function tenant(): BelongsTo
+    // Relationships
+    public function tenant()
     {
         return $this->belongsTo(Tenant::class);
     }
 
-    // Check if the room is available for the given period
-    public static function isRoomAvailable($roomId, $startDate, $endDate, $excludeAssignmentId = null)
+    public function room()
     {
-        $query = self::where('room_id', $roomId)
-            ->where('status', '!=', 'completed')
-            ->where(function ($q) use ($startDate, $endDate) {
-                $q->whereBetween('start_date', [$startDate, $endDate])
-                    ->orWhereBetween('end_date', [$startDate, $endDate])
-                    ->orWhere(function ($q) use ($startDate, $endDate) {
-                        $q->where('start_date', '<=', $startDate)
-                            ->where('end_date', '>=', $endDate);
-                    });
-            });
+        return $this->belongsTo(Room::class);
+    }
 
-        if ($excludeAssignmentId) {
-            $query->where('id', '!=', $excludeAssignmentId);
-        }
-
-        return !$query->exists();
+    public function assignedBy()
+    {
+        return $this->belongsTo(User::class, 'assigned_by');
     }
 }

@@ -1,104 +1,193 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Edit Room') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Edit Room') }}
+            </h2>
+            <a href="{{ route('admin.rooms.index') }}" 
+               class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-500 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                {{ __('Back to Rooms') }}
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 bg-white border-b border-gray-200">
-                    <form method="POST" action="{{ route('admin.rooms.update', $room) }}" class="space-y-6">
+                <div class="p-6 text-gray-900">
+                    <form method="POST" action="{{ route('admin.rooms.update', $room) }}">
                         @csrf
                         @method('PUT')
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Room Number -->
-                            <div>
-                                <x-input-label for="room_number" :value="__('Room Number')" />
-                                <x-text-input id="room_number" class="block mt-1 w-full" type="text" name="room_number" :value="old('room_number', $room->room_number)" 
-                                    pattern="[a-zA-Z0-9]+" title="Only letters and numbers are allowed" 
-                                    oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')" required />
-                                <x-input-error :messages="$errors->get('room_number')" class="mt-2" />
+                            <div class="mb-6">
+                                <label for="room_number" class="block text-sm font-medium text-gray-700 mb-2">
+                                    {{ __('Room Number') }}
+                                </label>
+                                <input type="text" 
+                                       id="room_number" 
+                                       name="room_number" 
+                                       value="{{ old('room_number', $room->room_number) }}" 
+                                       class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 @error('room_number') border-red-300 @enderror"
+                                       required>
+                                @error('room_number')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
 
-                            <!-- Type -->
-                            <div>
-                                <x-input-label for="type" :value="__('Room Type')" />
-                                <select id="type" name="type" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required onchange="updateCapacity()">
+                            <!-- Room Type -->
+                            <div class="mb-6">
+                                <label for="room_type" class="block text-sm font-medium text-gray-700 mb-2">
+                                    {{ __('Room Type') }}
+                                </label>
+                                <select id="room_type" 
+                                        name="room_type" 
+                                        class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 @error('room_type') border-red-300 @enderror"
+                                        required>
                                     <option value="">Select Room Type</option>
-                                    <option value="Single Bedroom" {{ old('type', $room->type) === 'Single Bedroom' ? 'selected' : '' }}>Single Bedroom</option>
-                                    <option value="Double Bedroom" {{ old('type', $room->type) === 'Double Bedroom' ? 'selected' : '' }}>Double Bedroom</option>
+                                    <option value="single" {{ old('room_type', $room->room_type) == 'single' ? 'selected' : '' }}>Single</option>
+                                    <option value="double" {{ old('room_type', $room->room_type) == 'double' ? 'selected' : '' }}>Double</option>
+                                    <option value="triple" {{ old('room_type', $room->room_type) == 'triple' ? 'selected' : '' }}>Triple</option>
+                                    <option value="quad" {{ old('room_type', $room->room_type) == 'quad' ? 'selected' : '' }}>Quad</option>
+                                    <option value="suite" {{ old('room_type', $room->room_type) == 'suite' ? 'selected' : '' }}>Suite</option>
                                 </select>
-                                <x-input-error :messages="$errors->get('type')" class="mt-2" />
-                            </div>
-
-                            <!-- Rate -->
-                            <div>
-                                <x-input-label for="rate" :value="__('Rate (₱)')" />
-                                <x-text-input id="rate" class="block mt-1 w-full" type="number" step="0.01" name="rate" :value="old('rate', $room->rate)" required />
-                                <x-input-error :messages="$errors->get('rate')" class="mt-2" />
+                                @error('room_type')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <!-- Capacity -->
-                            <div>
-                                <x-input-label for="capacity" :value="__('Capacity')" />
-                                <x-text-input id="capacity" name="capacity" class="block mt-1 w-full bg-gray-100" type="number" :value="old('capacity', $room->capacity)" readonly />
-                                <x-input-error :messages="$errors->get('capacity')" class="mt-2" />
+                            <div class="mb-6">
+                                <label for="capacity" class="block text-sm font-medium text-gray-700 mb-2">
+                                    {{ __('Capacity') }}
+                                </label>
+                                <input type="number" 
+                                       id="capacity" 
+                                       name="capacity" 
+                                       value="{{ old('capacity', $room->capacity) }}" 
+                                       min="1"
+                                       max="10"
+                                       class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 @error('capacity') border-red-300 @enderror"
+                                       required>
+                                @error('capacity')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Price -->
+                            <div class="mb-6">
+                                <label for="price" class="block text-sm font-medium text-gray-700 mb-2">
+                                    {{ __('Price (₱)') }}
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-gray-500 sm:text-sm">₱</span>
+                                    </div>
+                                    <input type="number" 
+                                           id="price" 
+                                           name="price" 
+                                           value="{{ old('price', $room->price) }}" 
+                                           step="0.01"
+                                           min="0"
+                                           class="block w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 @error('price') border-red-300 @enderror"
+                                           required>
+                                </div>
+                                @error('price')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <!-- Status -->
-                            <div>
-                                <x-input-label for="status" :value="__('Status')" />
-                                <select id="status" name="status" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                    <option value="available" {{ $room->status === 'available' ? 'selected' : '' }}>Available</option>
-                                    <option value="reserved" {{ $room->status === 'reserved' ? 'selected' : '' }}>Reserved</option>
-                                    <option value="occupied" {{ $room->status === 'occupied' ? 'selected' : '' }}>Occupied</option>
-                                    <option value="maintenance" {{ $room->status === 'maintenance' ? 'selected' : '' }}>Under Maintenance</option>
+                            <div class="mb-6">
+                                <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
+                                    {{ __('Status') }}
+                                </label>
+                                <select id="status" 
+                                        name="status" 
+                                        class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 @error('status') border-red-300 @enderror">
+                                    <option value="available" {{ old('status', $room->status) == 'available' ? 'selected' : '' }}>Available</option>
+                                    <option value="occupied" {{ old('status', $room->status) == 'occupied' ? 'selected' : '' }}>Occupied</option>
+                                    <option value="maintenance" {{ old('status', $room->status) == 'maintenance' ? 'selected' : '' }}>Under Maintenance</option>
+                                    <option value="reserved" {{ old('status', $room->status) == 'reserved' ? 'selected' : '' }}>Reserved</option>
                                 </select>
-                                <x-input-error :messages="$errors->get('status')" class="mt-2" />
-                            </div>
-
-                            <!-- Description -->
-                            <div class="md:col-span-2">
-                                <x-input-label for="description" :value="__('Description')" />
-                                <textarea id="description" name="description" rows="3" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">{{ old('description', $room->description) }}</textarea>
-                                <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                                @error('status')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-end mt-4">
-                            <a href="{{ route('admin.rooms.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 active:bg-gray-400 focus:outline-none focus:border-gray-500 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150 mr-3">
-                                Cancel
-                            </a>
-                            <x-primary-button>
+                        <!-- Description -->
+                        <div class="mb-6">
+                            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ __('Description') }}
+                            </label>
+                            <textarea id="description" 
+                                      name="description" 
+                                      rows="3"
+                                      class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 @error('description') border-red-300 @enderror">{{ old('description', $room->description) }}</textarea>
+                            @error('description')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Amenities -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ __('Amenities') }}
+                            </label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                @php
+                                    $availableAmenities = [
+                                        'air_conditioning' => 'Air Conditioning',
+                                        'wifi' => 'WiFi',
+                                        'private_bathroom' => 'Private Bathroom',
+                                        'shared_bathroom' => 'Shared Bathroom',
+                                        'desk' => 'Study Desk',
+                                        'wardrobe' => 'Wardrobe',
+                                        'mini_fridge' => 'Mini Fridge',
+                                        'balcony' => 'Balcony',
+                                        'tv' => 'Television',
+                                        'laundry' => 'Laundry Access'
+                                    ];
+                                    $selectedAmenities = old('amenities', $room->amenities ?? []);
+                                @endphp
+
+                                @foreach($availableAmenities as $key => $label)
+                                    <div class="flex items-center">
+                                        <input type="checkbox" 
+                                               id="amenity_{{ $key }}" 
+                                               name="amenities[]" 
+                                               value="{{ $key }}"
+                                               {{ in_array($key, $selectedAmenities) ? 'checked' : '' }}
+                                               class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                        <label for="amenity_{{ $key }}" class="ml-2 block text-sm text-gray-900">
+                                            {{ $label }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                            @error('amenities')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="flex items-center justify-end">
+                            <button type="submit" 
+                                    class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
                                 {{ __('Update Room') }}
-                            </x-primary-button>
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        function updateCapacity() {
-            const typeSelect = document.getElementById('type');
-            const capacityInput = document.getElementById('capacity');
-            
-            if (typeSelect.value === 'Single Bedroom') {
-                capacityInput.value = 1;
-            } else if (typeSelect.value === 'Double Bedroom') {
-                capacityInput.value = 2;
-            } else {
-                capacityInput.value = '';
-            }
-        }
-        
-        // Auto-update capacity on page load if type is already selected
-        document.addEventListener('DOMContentLoaded', function() {
-            updateCapacity();
-        });
-    </script>
 </x-app-layout>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\UtilityType;
 use Illuminate\Http\Request;
 
 class UtilityTypeController extends Controller
@@ -14,7 +15,7 @@ class UtilityTypeController extends Controller
      */
     public function index()
     {
-        $utilityTypes = \App\Models\UtilityType::orderBy('name')->paginate(10);
+        $utilityTypes = UtilityType::latest()->paginate(10);
         return view('admin.utility-types.index', compact('utilityTypes'));
     }
 
@@ -37,40 +38,48 @@ class UtilityTypeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:utility_types,name'],
-            'unit' => ['required', 'string', 'max:50'],
-            'description' => ['nullable', 'string', 'max:500'],
-            'status' => ['required', 'in:active,inactive']
+            'name' => 'required|string|max:255|unique:utility_types',
+            'unit_of_measurement' => 'required|string|max:255',
+            'custom_unit' => 'required_if:unit_of_measurement,Other|nullable|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:active,inactive',
         ]);
 
-        \App\Models\UtilityType::create($request->all());
+        // Handle custom unit
+        $unitOfMeasurement = $request->unit_of_measurement;
+        if ($request->unit_of_measurement === 'Other' && $request->filled('custom_unit')) {
+            $unitOfMeasurement = $request->custom_unit;
+        }
+
+        UtilityType::create([
+            'name' => $request->name,
+            'unit_of_measurement' => $unitOfMeasurement,
+            'description' => $request->description,
+            'status' => $request->status,
+        ]);
 
         return redirect()->route('admin.utility-types.index')
-            ->with('success', 'Utility type created successfully.');
+                         ->with('success', 'Utility type created successfully.');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  UtilityType  $utilityType
      * @return \Illuminate\Http\Response
      */
-    public function show(\App\Models\UtilityType $utilityType)
+    public function show(UtilityType $utilityType)
     {
-        $utilityType->load(['rates' => function($query) {
-            $query->orderBy('effective_date', 'desc');
-        }]);
-        
         return view('admin.utility-types.show', compact('utilityType'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  UtilityType  $utilityType
      * @return \Illuminate\Http\Response
      */
-    public function edit(\App\Models\UtilityType $utilityType)
+    public function edit(UtilityType $utilityType)
     {
         return view('admin.utility-types.edit', compact('utilityType'));
     }
@@ -79,40 +88,47 @@ class UtilityTypeController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  UtilityType  $utilityType
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, \App\Models\UtilityType $utilityType)
+    public function update(Request $request, UtilityType $utilityType)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:utility_types,name,' . $utilityType->id],
-            'unit' => ['required', 'string', 'max:50'],
-            'description' => ['nullable', 'string', 'max:500'],
-            'status' => ['required', 'in:active,inactive']
+            'name' => 'required|string|max:255|unique:utility_types,name,' . $utilityType->id,
+            'unit_of_measurement' => 'required|string|max:255',
+            'custom_unit' => 'required_if:unit_of_measurement,Other|nullable|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:active,inactive',
         ]);
 
-        $utilityType->update($request->all());
+        // Handle custom unit
+        $unitOfMeasurement = $request->unit_of_measurement;
+        if ($request->unit_of_measurement === 'Other' && $request->filled('custom_unit')) {
+            $unitOfMeasurement = $request->custom_unit;
+        }
+
+        $utilityType->update([
+            'name' => $request->name,
+            'unit_of_measurement' => $unitOfMeasurement,
+            'description' => $request->description,
+            'status' => $request->status,
+        ]);
 
         return redirect()->route('admin.utility-types.index')
-            ->with('success', 'Utility type updated successfully.');
+                         ->with('success', 'Utility type updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  UtilityType  $utilityType
      * @return \Illuminate\Http\Response
      */
-    public function destroy(\App\Models\UtilityType $utilityType)
+    public function destroy(UtilityType $utilityType)
     {
-        // Check if utility type has any readings or bills
-        if ($utilityType->readings()->exists() || $utilityType->rates()->exists()) {
-            return back()->with('error', 'Cannot delete utility type that has readings or rates associated with it.');
-        }
-
         $utilityType->delete();
-
+        
         return redirect()->route('admin.utility-types.index')
-            ->with('success', 'Utility type deleted successfully.');
+                         ->with('success', 'Utility type deleted successfully.');
     }
 }
