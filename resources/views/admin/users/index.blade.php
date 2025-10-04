@@ -23,6 +23,82 @@
                 </div>
             @endif
 
+            <!-- Search and Filter Section -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 border-b border-gray-200">
+                    <form method="GET" action="{{ route('admin.users.index') }}" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+                            <!-- Search -->
+                            <div class="lg:col-span-2">
+                                <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+                                <input type="text" name="search" id="search" 
+                                       value="{{ request('search') }}" 
+                                       placeholder="Search by name or email..." 
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+
+                            <!-- Role Filter -->
+                            <div>
+                                <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                                <select name="role" id="role" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="">All Roles</option>
+                                    <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                                    <option value="tenant" {{ request('role') == 'tenant' ? 'selected' : '' }}>Tenant</option>
+                                </select>
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div>
+                                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                                <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="">All Status</option>
+                                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                </select>
+                            </div>
+
+                            <!-- Date From -->
+                            <div>
+                                <label for="date_from" class="block text-sm font-medium text-gray-700">Date From</label>
+                                <input type="date" name="date_from" id="date_from" 
+                                       value="{{ request('date_from') }}" 
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+
+                            <!-- Date To -->
+                            <div>
+                                <label for="date_to" class="block text-sm font-medium text-gray-700">Date To</label>
+                                <input type="date" name="date_to" id="date_to" 
+                                       value="{{ request('date_to') }}" 
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex space-x-2">
+                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                    Search & Filter
+                                </button>
+                                <a href="{{ route('admin.users.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    Clear
+                                </a>
+                            </div>
+                            @if(request()->hasAny(['search', 'role', 'status', 'date_from', 'date_to']))
+                                <span class="text-sm text-gray-600">
+                                    Showing filtered results ({{ $users->total() }} total)
+                                </span>
+                            @endif
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     @if($users->count() > 0)

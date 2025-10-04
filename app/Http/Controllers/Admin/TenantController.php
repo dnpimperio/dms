@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
+use App\Models\Room;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class TenantController extends Controller
@@ -13,10 +15,58 @@ class TenantController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tenants = Tenant::latest()->paginate(10);
-        return view('admin.tenants.index', compact('tenants'));
+        $query = Tenant::with(['user', 'roomAssignments.room'])->whereHas('user');
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('personal_email', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter by room assigned
+        if ($request->filled('room')) {
+            $query->whereHas('roomAssignments', function($q) use ($request) {
+                $q->where('room_id', $request->room)
+                  ->where('status', 'active');
+            });
+        }
+
+        // Filter by status (based on room assignment)
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->whereHas('roomAssignments', function($q) {
+                    $q->where('status', 'active');
+                });
+            } elseif ($request->status === 'inactive') {
+                $query->whereDoesntHave('roomAssignments', function($q) {
+                    $q->where('status', 'active');
+                });
+            }
+        }
+
+        // Filter by date created
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $tenants = $query->latest()->paginate(10)->appends($request->query());
+        
+        // Get rooms for filter dropdown
+        $rooms = Room::orderBy('room_number')->get();
+        
+        return view('admin.tenants.index', compact('tenants', 'rooms'));
     }
 
     /**
