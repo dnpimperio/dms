@@ -26,7 +26,9 @@ class UtilityReadingController extends Controller
      */
     public function create()
     {
-        //
+        $utilityTypes = \App\Models\UtilityType::where('status', 'active')->get();
+        $rooms = \App\Models\Room::where('status', 'available')->orWhere('status', 'occupied')->get();
+        return view('admin.utility-readings.create', compact('utilityTypes', 'rooms'));
     }
 
     /**
@@ -48,7 +50,8 @@ class UtilityReadingController extends Controller
      */
     public function show($id)
     {
-        //
+        $utilityReading = UtilityReading::with(['room', 'utilityType', 'recordedBy'])->findOrFail($id);
+        return view('admin.utility-readings.show', compact('utilityReading'));
     }
 
     /**
@@ -59,7 +62,10 @@ class UtilityReadingController extends Controller
      */
     public function edit($id)
     {
-        //
+        $utilityReading = UtilityReading::with(['room', 'utilityType'])->findOrFail($id);
+        $rooms = Room::all();
+        $utilityTypes = UtilityType::all();
+        return view('admin.utility-readings.edit', compact('utilityReading', 'rooms', 'utilityTypes'));
     }
 
     /**

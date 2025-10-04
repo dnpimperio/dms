@@ -94,10 +94,10 @@
                                                 Room {{ $reading->room->room_number }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $reading->utilityType->name }}
+                                                {{ $reading->utilityType ? $reading->utilityType->name : 'Unknown' }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ number_format($reading->consumption, 2) }} {{ $reading->utilityType->unit }}
+                                                {{ number_format($reading->consumption, 2) }} {{ $reading->utilityType ? $reading->utilityType->unit : 'units' }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
                                                 ${{ number_format($reading->calculateCost(), 2) }}
@@ -148,7 +148,7 @@
                                                 {{ $bill->created_at->format('M d, Y') }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                {{ $bill->tenant->name }}
+                                                {{ $bill->tenant ? $bill->tenant->name : 'Unknown Tenant' }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 Room {{ $bill->room->room_number }}

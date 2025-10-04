@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -13,9 +14,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('bills', function (Blueprint $table) {
-            //
-        });
+        DB::statement("ALTER TABLE users MODIFY COLUMN gender ENUM('male', 'female', 'other') DEFAULT 'other'");
     }
 
     /**
@@ -25,7 +24,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('bills', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             //
         });
     }

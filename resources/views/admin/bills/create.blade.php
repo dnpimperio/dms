@@ -34,7 +34,12 @@
                                     <option value="">Select Room</option>
                                     @foreach($rooms as $room)
                                         <option value="{{ $room->id }}" {{ old('room_id') == $room->id ? 'selected' : '' }}>
-                                            {{ $room->room_number }}
+                                            {{ $room->room_number }} - 
+                                            @if($room->activeAssignment && $room->activeAssignment->tenant)
+                                                {{ $room->activeAssignment->tenant->name }}
+                                            @else
+                                                Vacant
+                                            @endif
                                         </option>
                                     @endforeach
                                 </select>

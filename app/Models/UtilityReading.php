@@ -12,16 +12,17 @@ class UtilityReading extends Model
     protected $fillable = [
         'room_id',
         'utility_type_id',
-        'reading_value',
+        'current_reading',
         'previous_reading',
         'consumption',
         'reading_date',
         'recorded_by',
         'notes',
+        'bill_id',
     ];
 
     protected $casts = [
-        'reading_value' => 'decimal:2',
+        'current_reading' => 'decimal:2',
         'previous_reading' => 'decimal:2',
         'consumption' => 'decimal:2',
         'reading_date' => 'date',
@@ -41,5 +42,32 @@ class UtilityReading extends Model
     public function recordedBy()
     {
         return $this->belongsTo(User::class, 'recorded_by');
+    }
+
+    public function bill()
+    {
+        return $this->belongsTo(Bill::class);
+    }
+
+    /**
+     * Calculate the cost of this utility reading based on consumption and current rate
+     */
+    public function calculateCost()
+    {
+        // Get the current rate for this utility type
+        $rate = UtilityRate::where('utility_type_id', $this->utility_type_id)
+            ->where('status', 'active')
+            ->where('effective_from', '<=', $this->reading_date)
+            ->where(function ($query) {
+                $query->whereNull('effective_until')
+                    ->orWhere('effective_until', '>=', $this->reading_date);
+            })
+            ->first();
+
+        if (!$rate) {
+            return 0; // No rate found, return 0
+        }
+
+        return $this->consumption * $rate->rate_per_unit;
     }
 }

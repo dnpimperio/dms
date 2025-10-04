@@ -26,7 +26,8 @@ class UtilityRateController extends Controller
      */
     public function create()
     {
-        //
+        $utilityTypes = \App\Models\UtilityType::where('status', 'active')->get();
+        return view('admin.utility-rates.create', compact('utilityTypes'));
     }
 
     /**
@@ -48,7 +49,8 @@ class UtilityRateController extends Controller
      */
     public function show($id)
     {
-        //
+        $utilityRate = UtilityRate::with(['utilityType', 'createdBy'])->findOrFail($id);
+        return view('admin.utility-rates.show', compact('utilityRate'));
     }
 
     /**
@@ -59,7 +61,9 @@ class UtilityRateController extends Controller
      */
     public function edit($id)
     {
-        //
+        $utilityRate = UtilityRate::with('utilityType')->findOrFail($id);
+        $utilityTypes = UtilityType::all();
+        return view('admin.utility-rates.edit', compact('utilityRate', 'utilityTypes'));
     }
 
     /**

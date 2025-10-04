@@ -71,7 +71,9 @@
                                 </div>
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500">Login Email</dt>
-                                    <dd class="mt-1 text-sm text-gray-900">{{ $tenant->user->email }}</dd>
+                                    <dd class="mt-1 text-sm text-gray-900">
+                                        {{ $tenant->user ? $tenant->user->email : 'No user account linked' }}
+                                    </dd>
                                 </div>
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500">Permanent Address</dt>

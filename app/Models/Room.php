@@ -11,17 +11,17 @@ class Room extends Model
 
     protected $fillable = [
         'room_number',
-        'room_type',
+        'type',
         'capacity',
-        'price',
+        'rate',
         'status',
         'description',
-        'amenities',
+        'current_occupants',
+        'hidden',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
-        'amenities' => 'array',
+        'rate' => 'decimal:2',
     ];
 
     // Relationships
@@ -31,9 +31,32 @@ class Room extends Model
         return $this->belongsTo(Tenant::class, 'current_tenant_id');
     }
 
+    public function tenant()
+    {
+        // Get the currently assigned tenant through active room assignment
+        return $this->hasOneThrough(
+            Tenant::class,
+            RoomAssignment::class,
+            'room_id', // Foreign key on room_assignments table
+            'id', // Foreign key on tenants table
+            'id', // Local key on rooms table
+            'tenant_id' // Local key on room_assignments table
+        )->where('room_assignments.status', 'active');
+    }
+
     public function assignments()
     {
         return $this->hasMany(RoomAssignment::class);
+    }
+
+    public function activeAssignment()
+    {
+        return $this->hasOne(RoomAssignment::class)->where('status', 'active');
+    }
+
+    public function currentAssignments()
+    {
+        return $this->hasMany(RoomAssignment::class)->where('status', 'active');
     }
 
     public function bills()

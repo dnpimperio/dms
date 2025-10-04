@@ -51,11 +51,26 @@
 
                                 <div>
                                     <x-input-label for="gender" :value="__('Gender')" />
-                                    <div class="mt-1 p-3 bg-gray-100 rounded-md">
-                                        <span class="text-sm text-gray-700">Female</span>
-                                        <input type="hidden" name="gender" value="female" />
-                                    </div>
+                                    <select id="gender" name="gender" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                                        <option value="">Select Gender</option>
+                                        <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
+                                        <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
+                                        <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other</option>
+                                    </select>
                                     <x-input-error :messages="$errors->get('gender')" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="civil_status" :value="__('Civil Status')" />
+                                    <select id="civil_status" name="civil_status" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                                        <option value="">Select Civil Status</option>
+                                        <option value="single" {{ old('civil_status') == 'single' ? 'selected' : '' }}>Single</option>
+                                        <option value="married" {{ old('civil_status') == 'married' ? 'selected' : '' }}>Married</option>
+                                        <option value="divorced" {{ old('civil_status') == 'divorced' ? 'selected' : '' }}>Divorced</option>
+                                        <option value="widowed" {{ old('civil_status') == 'widowed' ? 'selected' : '' }}>Widowed</option>
+                                        <option value="separated" {{ old('civil_status') == 'separated' ? 'selected' : '' }}>Separated</option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('civil_status')" class="mt-2" />
                                 </div>
 
                                 <div>
@@ -114,9 +129,9 @@
                                 </div>
 
                                 <div>
-                                    <x-input-label for="provincial_address" :value="__('Provincial Address')" />
-                                    <textarea id="provincial_address" name="provincial_address" rows="3" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>{{ old('provincial_address') }}</textarea>
-                                    <x-input-error :messages="$errors->get('provincial_address')" class="mt-2" />
+                                    <x-input-label for="permanent_address" :value="__('Permanent Address')" />
+                                    <textarea id="permanent_address" name="permanent_address" rows="3" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>{{ old('permanent_address') }}</textarea>
+                                    <x-input-error :messages="$errors->get('permanent_address')" class="mt-2" />
                                 </div>
 
                                 <div>

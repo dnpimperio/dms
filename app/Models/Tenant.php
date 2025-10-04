@@ -10,21 +10,36 @@ class Tenant extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'first_name',
+        'middle_name',
         'last_name',
-        'email',
-        'phone_number',
-        'date_of_birth',
+        'birth_date',
         'gender',
-        'address',
-        'status',
+        'nationality',
+        'occupation',
+        'civil_status',
+        'phone_number',
+        'alternative_phone',
+        'personal_email',
+        'permanent_address',
+        'current_address',
+        'id_type',
+        'id_number',
+        'id_image_path',
+        'remarks',
     ];
 
     protected $casts = [
-        'date_of_birth' => 'date',
+        'birth_date' => 'date',
     ];
 
     // Relationships
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function currentRoom()
     {
         // Simple relationship - we'll enhance this later with proper room assignments
@@ -32,6 +47,11 @@ class Tenant extends Model
     }
 
     public function assignments()
+    {
+        return $this->hasMany(RoomAssignment::class);
+    }
+
+    public function roomAssignments()
     {
         return $this->hasMany(RoomAssignment::class);
     }
@@ -50,5 +70,11 @@ class Tenant extends Model
     public function emergencyContacts()
     {
         return $this->hasMany(EmergencyContact::class);
+    }
+
+    // Accessors
+    public function getNameAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name;
     }
 }

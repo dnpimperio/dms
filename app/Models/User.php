@@ -53,4 +53,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(RoomAssignment::class, 'tenant_id');
     }
+
+    /**
+     * Get the tenant profile for the user.
+     */
+    public function tenant()
+    {
+        return $this->hasOne(Tenant::class);
+    }
 }
