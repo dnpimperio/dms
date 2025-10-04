@@ -18,12 +18,11 @@ class Tenant extends Model
         'gender',
         'nationality',
         'occupation',
-        'university',
-        'course',
-        'provincial_address',
+        'civil_status',
         'phone_number',
         'alternative_phone',
         'personal_email',
+        'permanent_address',
         'current_address',
         'id_type',
         'id_number',
@@ -36,6 +35,11 @@ class Tenant extends Model
     ];
 
     // Relationships
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function currentRoom()
     {
         // Simple relationship - we'll enhance this later with proper room assignments
@@ -43,6 +47,11 @@ class Tenant extends Model
     }
 
     public function assignments()
+    {
+        return $this->hasMany(RoomAssignment::class);
+    }
+
+    public function roomAssignments()
     {
         return $this->hasMany(RoomAssignment::class);
     }

@@ -50,7 +50,8 @@ class UtilityReadingController extends Controller
      */
     public function show($id)
     {
-        //
+        $utilityReading = UtilityReading::with(['room', 'utilityType', 'recordedBy'])->findOrFail($id);
+        return view('admin.utility-readings.show', compact('utilityReading'));
     }
 
     /**
@@ -61,7 +62,10 @@ class UtilityReadingController extends Controller
      */
     public function edit($id)
     {
-        //
+        $utilityReading = UtilityReading::with(['room', 'utilityType'])->findOrFail($id);
+        $rooms = Room::all();
+        $utilityTypes = UtilityType::all();
+        return view('admin.utility-readings.edit', compact('utilityReading', 'rooms', 'utilityTypes'));
     }
 
     /**

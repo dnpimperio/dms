@@ -37,7 +37,44 @@ class TenantController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'birth_date' => 'required|date|before:' . now()->subYears(18)->format('Y-m-d'),
+            'gender' => 'required|in:male,female,other',
+            'civil_status' => 'required|in:single,married,divorced,widowed,separated',
+            'nationality' => 'required|string|max:255',
+            'occupation' => 'required|string|max:255',
+            'phone_number' => 'required|string|max:20',
+            'alternative_phone' => 'nullable|string|max:20',
+            'personal_email' => 'required|email|unique:tenants,personal_email',
+            'permanent_address' => 'required|string',
+            'current_address' => 'nullable|string',
+            'id_type' => 'required|string|max:255',
+            'id_number' => 'required|string|max:255',
+            'id_image_path' => 'nullable|string|max:255',
+            'remarks' => 'nullable|string',
+        ]);
+
+        // Create user account for the tenant
+        $user = User::create([
+            'name' => $request->first_name . ' ' . $request->last_name,
+            'email' => $request->personal_email,
+            'password' => bcrypt('password'), // Default password
+            'role' => 'tenant',
+            'status' => 'active',
+            'gender' => $request->gender,
+        ]);
+
+        // Create tenant record
+        $tenantData = $request->all();
+        $tenantData['user_id'] = $user->id;
+        
+        Tenant::create($tenantData);
+
+        return redirect()->route('admin.tenants.index')
+            ->with('success', 'Tenant and user account created successfully.');
     }
 
     /**
@@ -48,7 +85,8 @@ class TenantController extends Controller
      */
     public function show($id)
     {
-        //
+        $tenant = Tenant::with(['user', 'roomAssignments.room', 'emergencyContacts'])->findOrFail($id);
+        return view('admin.tenants.show', compact('tenant'));
     }
 
     /**
@@ -76,13 +114,19 @@ class TenantController extends Controller
         
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:tenants,email,' . $tenant->id,
-            'phone_number' => 'nullable|string|max:20',
-            'date_of_birth' => 'nullable|date',
-            'gender' => 'nullable|in:male,female,other',
-            'address' => 'nullable|string',
-            'status' => 'required|in:active,inactive,moved_out',
+            'birth_date' => 'required|date|before:' . now()->subYears(18)->format('Y-m-d'),
+            'gender' => 'required|in:male,female,other',
+            'civil_status' => 'required|in:single,married,divorced,widowed,separated',
+            'nationality' => 'required|string|max:255',
+            'occupation' => 'required|string|max:255',
+            'phone_number' => 'required|string|max:20',
+            'alternative_phone' => 'nullable|string|max:20',
+            'personal_email' => 'required|email|unique:tenants,personal_email,' . $tenant->id,
+            'permanent_address' => 'required|string',
+            'current_address' => 'nullable|string',
+            'remarks' => 'nullable|string',
         ]);
 
         $tenant->update($validated);

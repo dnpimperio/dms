@@ -54,6 +54,11 @@ class Room extends Model
         return $this->hasOne(RoomAssignment::class)->where('status', 'active');
     }
 
+    public function currentAssignments()
+    {
+        return $this->hasMany(RoomAssignment::class)->where('status', 'active');
+    }
+
     public function bills()
     {
         return $this->hasMany(Bill::class);

@@ -48,7 +48,12 @@ class RoomController extends Controller
      */
     public function show($id)
     {
-        //
+        $room = Room::with([
+            'activeAssignment.tenant', 
+            'currentAssignments.tenant', 
+            'utilityReadings.utilityType'
+        ])->findOrFail($id);
+        return view('admin.rooms.show', compact('room'));
     }
 
     /**

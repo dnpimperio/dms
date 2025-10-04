@@ -13,27 +13,48 @@ class Bill extends Model
         'tenant_id',
         'room_id',
         'bill_type',
-        'amount',
-        'due_date',
-        'status',
         'description',
-        'paid_at',
+        'details',
+        'amount',
+        'created_by',
+        'bill_date',
+        'room_rate',
+        'electricity',
+        'water',
+        'other_charges',
+        'other_charges_description',
+        'total_amount',
+        'status',
+        'amount_paid',
+        'due_date',
     ];
 
     protected $casts = [
+        'bill_date' => 'date',
         'due_date' => 'date',
-        'paid_at' => 'datetime',
         'amount' => 'decimal:2',
+        'room_rate' => 'decimal:2',
+        'electricity' => 'decimal:2',
+        'water' => 'decimal:2',
+        'other_charges' => 'decimal:2',
+        'total_amount' => 'decimal:2',
+        'amount_paid' => 'decimal:2',
+        'details' => 'array',
     ];
 
     // Relationships
     public function tenant()
     {
-        return $this->belongsTo(Tenant::class);
+        return $this->belongsTo(User::class, 'tenant_id');
     }
 
     public function room()
     {
         return $this->belongsTo(Room::class);
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

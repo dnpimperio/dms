@@ -50,7 +50,8 @@ class BillController extends Controller
      */
     public function show(Bill $bill)
     {
-        //
+        $bill->load(['tenant', 'room', 'createdBy']);
+        return view('admin.bills.show', compact('bill'));
     }
 
     /**
