@@ -26,7 +26,9 @@ class BillController extends Controller
      */
     public function create()
     {
-        //
+        $rooms = \App\Models\Room::with(['activeAssignment.tenant'])->get();
+        $tenants = \App\Models\Tenant::all();
+        return view('admin.bills.create', compact('rooms', 'tenants'));
     }
 
     /**

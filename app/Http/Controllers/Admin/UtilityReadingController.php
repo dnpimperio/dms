@@ -26,7 +26,9 @@ class UtilityReadingController extends Controller
      */
     public function create()
     {
-        //
+        $utilityTypes = \App\Models\UtilityType::where('status', 'active')->get();
+        $rooms = \App\Models\Room::where('status', 'available')->orWhere('status', 'occupied')->get();
+        return view('admin.utility-readings.create', compact('utilityTypes', 'rooms'));
     }
 
     /**

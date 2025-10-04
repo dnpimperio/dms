@@ -26,7 +26,8 @@ class UtilityRateController extends Controller
      */
     public function create()
     {
-        //
+        $utilityTypes = \App\Models\UtilityType::where('status', 'active')->get();
+        return view('admin.utility-rates.create', compact('utilityTypes'));
     }
 
     /**

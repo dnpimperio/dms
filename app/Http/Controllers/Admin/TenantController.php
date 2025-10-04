@@ -26,7 +26,7 @@ class TenantController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.tenants.create');
     }
 
     /**

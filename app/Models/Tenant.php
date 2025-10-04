@@ -10,18 +10,29 @@ class Tenant extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'first_name',
+        'middle_name',
         'last_name',
-        'email',
-        'phone_number',
-        'date_of_birth',
+        'birth_date',
         'gender',
-        'address',
-        'status',
+        'nationality',
+        'occupation',
+        'university',
+        'course',
+        'provincial_address',
+        'phone_number',
+        'alternative_phone',
+        'personal_email',
+        'current_address',
+        'id_type',
+        'id_number',
+        'id_image_path',
+        'remarks',
     ];
 
     protected $casts = [
-        'date_of_birth' => 'date',
+        'birth_date' => 'date',
     ];
 
     // Relationships
@@ -50,5 +61,11 @@ class Tenant extends Model
     public function emergencyContacts()
     {
         return $this->hasMany(EmergencyContact::class);
+    }
+
+    // Accessors
+    public function getNameAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name;
     }
 }

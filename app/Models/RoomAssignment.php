@@ -14,14 +14,15 @@ class RoomAssignment extends Model
         'room_id',
         'start_date',
         'end_date',
-        'is_active',
-        'assigned_by',
+        'monthly_rent',
+        'status',
+        'notes',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
-        'is_active' => 'boolean',
+        'monthly_rent' => 'decimal:2',
     ];
 
     // Relationships

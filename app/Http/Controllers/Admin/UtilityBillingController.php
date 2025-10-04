@@ -175,7 +175,7 @@ class UtilityBillingController extends Controller
     public function showGenerateForm()
     {
         $utilityTypes = UtilityType::where('status', 'active')->get();
-        $rooms = Room::with('currentTenant')->orderBy('room_number')->get();
+        $rooms = Room::with(['activeAssignment.tenant'])->orderBy('room_number')->get();
         
         // Get available billing months (months with readings)
         $availableMonths = UtilityReading::selectRaw('DATE_FORMAT(reading_date, "%Y-%m") as month')
