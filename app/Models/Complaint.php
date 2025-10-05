@@ -4,41 +4,44 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class MaintenanceRequest extends Model
+class Complaint extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'tenant_id',
         'room_id',
+        'title',
         'description',
-        'area',
-        'status',
+        'category',
         'priority',
-        'photos',
+        'status',
+        'attachments',
         'assigned_to',
+        'resolution',
+        'resolved_at'
     ];
 
     protected $casts = [
-        'photos' => 'array',
+        'attachments' => 'array',
+        'resolved_at' => 'datetime'
     ];
 
-    public function tenant(): BelongsTo
+    public function tenant()
     {
-        return $this->belongsTo(Tenant::class)->withDefault([
+        return $this->belongsTo(User::class, 'tenant_id')->withDefault([
             'first_name' => 'Former',
             'last_name' => 'Tenant'
         ]);
     }
 
-    public function room(): BelongsTo
+    public function room()
     {
         return $this->belongsTo(Room::class);
     }
 
-    public function assignee(): BelongsTo
+    public function assignedTo()
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }
