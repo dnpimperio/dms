@@ -25,7 +25,7 @@ return [
     |
     */
 
-    'path' => env('FILAMENT_PATH', 'filament-admin'),
+    'path' => env('FILAMENT_PATH', 'dashboard'),
 
     /*
     |--------------------------------------------------------------------------
